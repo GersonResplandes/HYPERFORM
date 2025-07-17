@@ -10,6 +10,7 @@ module.exports = {
       user: process.env.DB_USER || 'root',
       password: process.env.DB_PASSWORD || '',
       database: process.env.DB_NAME || 'hyperform_dev',
+      charset: 'utf8mb4',
     },
     pool: {
       min: 2,
@@ -31,6 +32,7 @@ module.exports = {
       user: process.env.TEST_DB_USER || 'root',
       password: process.env.TEST_DB_PASSWORD || '',
       database: process.env.TEST_DB_NAME || 'hyperform_test',
+      charset: 'utf8mb4',
     },
     pool: {
       min: 2,
@@ -52,6 +54,7 @@ module.exports = {
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
+      charset: 'utf8mb4',
     },
     pool: {
       min: 2,

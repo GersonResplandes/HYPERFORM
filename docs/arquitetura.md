@@ -1,32 +1,42 @@
-# Arquitetura do Sistema de Gestão de Academia
+# Arquitetura do Sistema de Gestão da HYPERFORM
 
 ## Visão Geral
 
-O sistema de gestão de academia é uma plataforma modular, escalável e segura, projetada para atender desde pequenas academias até grandes redes. O objetivo é garantir facilidade de manutenção, evolução contínua e integração com outros sistemas. A arquitetura monorepo permite compartilhamento eficiente de código, padronização e automação de processos.
+A HYPERFORM é uma plataforma digital para gestão de academias, studios e centros de performance físico-funcional. O sistema é modular, escalável e seguro, pensado para suportar desde operações locais até grandes redes com múltiplas unidades.
+
+Utilizamos uma arquitetura **monorepo baseada em NPM workspaces**, permitindo alto reaproveitamento de código, consistência nas práticas de engenharia e facilidade de automação contínua.
 
 ### Objetivos Arquiteturais
 
-- **Escalabilidade horizontal**: fácil deploy em múltiplos servidores/containers.
-- **Separação de responsabilidades**: cada camada tem um papel claro.
-- **Facilidade de onboarding**: documentação e padrões claros para novos devs.
-- **Segurança desde o início**: práticas de secure by design.
+- 🧩 Modularidade: separação clara entre domínio, interface, infraestrutura e configuração.
+- 🔐 Segurança desde o design: validações, autenticação robusta e princípios de segurança na arquitetura.
+- 📈 Escalabilidade horizontal: suportar múltiplos usuários, unidades e integrações externas.
+- 📚 Documentação clara: onboarding rápido e previsibilidade para novos colaboradores.
+- ⚙️ Extensibilidade: fácil acoplamento de novos módulos e serviços futuros (ex: pagamentos, biometria, relatórios).
 
-## Tecnologias Escolhidas e Justificativas
+---
 
-- **TypeScript**: Tipagem estática, reduz erros em tempo de execução, facilita refatoração e onboarding.
-- **Node.js + Express**: Backend performático, flexível, com grande comunidade e fácil integração com bancos e serviços.
-- **Next.js**: Permite SSR, SSG, rotas dinâmicas e ótima experiência de desenvolvimento frontend.
-- **MySQL**: Banco relacional robusto, ideal para dados estruturados e integridade transacional.
-- **NPM Workspaces**: Monorepo simples, sem dependência de ferramentas pesadas, facilita o versionamento e o compartilhamento de pacotes.
-- **ESLint, Prettier, Husky, Commitlint**: Garantem padronização, qualidade e automação de processos de revisão de código.
+## Tecnologias e Justificativas
 
-### Outras recomendações
+| Tecnologia             | Justificativa                                                                  |
+| ---------------------- | ------------------------------------------------------------------------------ |
+| TypeScript             | Tipagem forte, segurança, melhor manutenção e produtividade.                   |
+| Node.js + Express      | Backend leve, altamente customizável, com comunidade madura.                   |
+| Next.js                | Suporte a SSR, SSG, rotas dinâmicas e ótima integração com TypeScript.         |
+| MySQL                  | Banco relacional estável, com integridade transacional e alta compatibilidade. |
+| NPM Workspaces         | Gerência simples de monorepo, sem sobrecarga de ferramentas.                   |
+| ESLint, Prettier, etc. | Garantia de código limpo, padronizado e revisável.                             |
 
-- **Jest** para testes unitários.
-- **Playwright/Cypress** para testes E2E.
-- **Docker** para ambientes de desenvolvimento e produção (futuro).
+#### Bibliotecas e Ferramentas Complementares
 
-## Diagrama de Arquitetura (C4 - Container)
+- `Jest`: testes unitários
+- `Playwright` ou `Cypress`: testes E2E (futuramente)
+- `Husky`, `Lint-staged`, `Commitlint`: automação e consistência em commits
+- `Docker`: padronização futura de ambientes (produção/dev)
+
+---
+
+## Diagrama de Arquitetura (C4 - Container Level)
 
 ```mermaid
 flowchart LR
@@ -34,107 +44,123 @@ flowchart LR
     A[Usuário]-->|HTTP(S)|B[Next.js App]
   end
   subgraph API["apps/api (Express)"]
-    B2[Express API]
+    B2[REST API]
   end
-  subgraph DB["MySQL"]
-    C[(DB)]
+  subgraph DB["MySQL Database"]
+    C[(MySQL)]
   end
-  B-->|REST/JSON|B2
+  B-->|REST|B2
   B2-->|SQL|C
 ```
 
-### Fluxo de Requisição
+---
 
-1. Usuário acessa o frontend (Next.js).
-2. Frontend faz requisições REST para a API (Express).
-3. API processa, aplica regras de negócio e acessa o banco MySQL.
-4. Resposta retorna ao frontend e é exibida ao usuário.
+## Fluxo de Requisição
 
-## Estratégia de Versionamento, Organização e Convenções
+1. O usuário interage com a aplicação web (Next.js).
+2. A interface realiza chamadas REST para a API.
+3. A API processa dados, aplica regras de negócio e interage com o banco MySQL.
+4. A resposta segue de volta para o frontend para renderização ou feedback.
 
-- **Monorepo**: `apps/` para aplicações, `packages/` para libs/configs.
-- **Versionamento Semântico (SemVer)**: facilita releases e controle de breaking changes.
-- **Commits validados por commitlint**: padrão Conventional Commits.
-- **Branches**:
+---
+
+## Estrutura de Monorepo
+
+```txt
+/apps
+  ├── web        → Frontend em Next.js
+  └── api        → Backend em Node.js + Express
+/packages
+  ├── ui         → Componentes visuais reutilizáveis
+  └── config     → Regras compartilhadas (lint, tsconfig, etc)
+```
+
+---
+
+## Versionamento e Convenções
+
+- **Versionamento Semântico (SemVer)**
+- **Commits padronizados** (`Conventional Commits`)
+- **Branches:**
   - `main`: produção
   - `develop`: homologação
   - `feature/*`: novas features
   - `fix/*`: correções
-- **Pull Requests**: obrigatórios para merge em `main` e `develop`.
-- **Padronização de código**: ESLint, Prettier e EditorConfig obrigatórios.
 
-## Camadas e Responsabilidades
-
-### Backend (apps/api)
-
-- **Domain**: entidades, value objects, casos de uso, regras de negócio puras.
-- **Infra**: repositórios, integrações externas, acesso a banco, provedores de autenticação.
-- **App**: controllers, rotas, middlewares, orquestração de casos de uso.
-
-**Exemplo de fluxo:**
-
-1. Controller recebe requisição.
-2. Valida dados e chama caso de uso do domínio.
-3. Caso de uso interage com repositórios (infra).
-4. Resposta é devolvida ao controller e enviada ao cliente.
-
-### Frontend (apps/web)
-
-- **Pages**: rotas e páginas do Next.js.
-- **Components**: componentes de UI reutilizáveis.
-- **Services**: comunicação com API.
-- **Hooks**: lógica de estado e efeitos.
-
-### Pacotes Compartilhados
-
-- **UI**: componentes visuais reutilizáveis.
-- **Config**: regras de lint, prettier, tsconfig, etc.
-
-## Estratégia de Testes Automatizados
-
-- **Unitários**: Jest para backend e frontend. Cobertura mínima de 80%.
-- **E2E**: Playwright ou Cypress para testes ponta a ponta (futuro).
-- **Testes de integração**: recomendados para fluxos críticos.
-- **Estrutura**: arquivos de teste em `__tests__` próximos ao código testado.
-- **CI/CD**: pipeline deve rodar todos os testes antes de permitir merge.
-
-## Considerações sobre Segurança, Escalabilidade e Performance
-
-### Segurança
-
-- **Autenticação JWT**: padrão para APIs modernas, fácil de escalar.
-- **Variáveis sensíveis**: nunca versionar `.env`, usar `.env.example`.
-- **Validação de entrada**: sempre validar dados recebidos na API.
-- **CORS restrito**: liberar apenas domínios confiáveis.
-- **Dependências**: manter sempre atualizadas e monitorar vulnerabilidades.
-
-### Escalabilidade
-
-- **Separação de responsabilidades**: facilita deploy independente de apps/pacotes.
-- **Containers**: arquitetura pronta para Docker/Kubernetes.
-- **Banco relacional**: permite sharding, replicação e alta disponibilidade.
-
-### Performance
-
-- **SSR/SSG no frontend**: melhora SEO e tempo de carregamento.
-- **Cache**: considerar Redis/memcached para dados críticos (futuro).
-- **Consultas otimizadas**: uso de índices e queries eficientes no MySQL.
-
-## Justificativas Técnicas
-
-- **Clean Architecture/DDD**: facilita evolução, testes e onboarding.
-- **Monorepo**: simplifica dependências, compartilhamento de código e automação.
-- **Ferramentas de qualidade**: menos bugs, mais produtividade.
-- **Documentação**: onboarding rápido e menos dúvidas para novos devs.
-
-## Boas Práticas e Recomendações
-
-- Sempre documentar decisões arquiteturais relevantes.
-- Manter README e docs atualizados.
-- Automatizar o máximo possível (lint, testes, build, deploy).
-- Revisar dependências periodicamente.
-- Priorizar segurança e performance desde o início.
+- **Pull Requests obrigatórios**
+- **CI/CD obrigatório para merges em `main`**
+- **Code linting e testes automatizados antes do merge**
 
 ---
 
-**Este documento deve ser revisado e expandido conforme o sistema evoluir.**
+## Camadas e Responsabilidades
+
+### Backend (`apps/api`)
+
+- **Domain**: entidades, value objects, casos de uso e lógica de negócio pura.
+- **App**: controllers, middlewares, orquestração de use cases.
+- **Infra**: repositórios, integrações externas, persistência e autenticação.
+
+### Frontend (`apps/web`)
+
+- **Pages**: rotas/páginas do Next.js.
+- **Components**: componentes reutilizáveis.
+- **Services**: comunicação com a API.
+- **Hooks**: lógica de estado, contexto e efeitos colaterais.
+
+### Shared (`packages/`)
+
+- **UI**: design system e componentes compartilhados.
+- **Config**: configs de eslint, prettier, tsconfig, jest, etc.
+
+---
+
+## Estratégia de Testes
+
+- **Unitários:** Jest (mínimo 80% cobertura)
+- **Integração:** com foco em fluxos críticos
+- **E2E:** com Playwright ou Cypress (futuro)
+- **Estrutura de testes:**  
+  `__tests__/` ao lado do código testado
+- **Pipeline CI/CD:** testes devem rodar e passar antes do merge
+
+---
+
+## Segurança, Escalabilidade e Performance
+
+### Segurança
+
+- JWT como padrão de autenticação
+- CORS restritivo e validado por ambiente
+- Validação de input em todas as camadas de entrada
+- Monitoramento de vulnerabilidades com ferramentas como Snyk ou `npm audit`
+
+### Escalabilidade
+
+- API Stateless, preparada para containers e balanceadores
+- Banco preparado para replicação/leitura separada (read replicas)
+- Modulos desacopláveis e deployment independente no futuro (ex: microsserviços)
+
+### Performance
+
+- SSG e SSR para páginas estáticas/críticas
+- Uso de cache (Redis) para dados de leitura intensiva (futuro)
+- Indexação e queries otimizadas no banco
+- Observabilidade: futura integração com logs, métricas e tracing distribuído
+
+---
+
+## Boas Práticas Reforçadas
+
+- Decisões arquiteturais documentadas e versionadas
+- CI/CD com validações automáticas
+- Docs atualizadas a cada modificação de contexto
+- Dependências auditadas periodicamente
+- Design guiado por domínio (DDD)
+
+---
+
+> **Este documento é vivo.** Será continuamente revisado e aprimorado conforme o produto evoluir.
+
+**Autor:** GÉRSON RESPLANDES DE SÁ SOUSA
+**Projeto:** HYPERFORM – Sistema de Gestão de Academias

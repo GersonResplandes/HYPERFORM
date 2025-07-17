@@ -2,15 +2,19 @@ import 'reflect-metadata';
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+const compression = require('compression');
 
 import './shared/container';
-import { usersRoutes } from './app/routes/users.routes';
 import { errorHandler } from './app/middlewares/errorHandler';
 import { performanceMonitor } from './app/middlewares/performanceMonitor';
+import { routes } from './app/routes';
 
 dotenv.config();
 
 export const app = express();
+
+// Compressão gzip
+app.use(compression());
 
 // Monitoramento de performance
 app.use(performanceMonitor);
@@ -30,7 +34,7 @@ app.get('/health', (req, res) => {
 });
 
 // Routes
-app.use('/users', usersRoutes);
+app.use(routes);
 
 // Error handling
 app.use(errorHandler);
