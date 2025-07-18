@@ -6,6 +6,8 @@ import { ListStudentsWithFiltersUseCase } from '../../domain/use-cases/ListStude
 // import { GetStudentByIdUseCase } from '../../domain/use-cases/GetStudentByIdUseCase';
 import { UpdateStudentUseCase } from '../../domain/use-cases/UpdateStudentUseCase';
 import { DeleteStudentUseCase } from '../../domain/use-cases/DeleteStudentUseCase';
+import { UpdateStudentSecureUseCase } from '../../domain/use-cases/UpdateStudentSecureUseCase';
+import { DeleteStudentSecureUseCase } from '../../domain/use-cases/DeleteStudentSecureUseCase';
 
 export class StudentsController {
   private studentsRepository = new StudentsRepository();
@@ -111,6 +113,23 @@ export class StudentsController {
     }
   }
 
+  async updateSecure(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    try {
+      const { id } = req.params;
+      const user_id = req.user.id;
+      const { name, email } = req.body;
+      const useCase = new UpdateStudentSecureUseCase(this.studentsRepository);
+      const student = await useCase.execute({ id, user_id, name, email });
+      return res.status(200).json(student);
+    } catch (err) {
+      return next(err);
+    }
+  }
+
   async delete(
     req: Request,
     res: Response,
@@ -123,6 +142,22 @@ export class StudentsController {
       await useCase.execute(id, user_id);
       return res.status(204).send();
     } catch (err: any) {
+      return next(err);
+    }
+  }
+
+  async deleteSecure(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    try {
+      const { id } = req.params;
+      const user_id = req.user.id;
+      const useCase = new DeleteStudentSecureUseCase(this.studentsRepository);
+      await useCase.execute({ id, user_id });
+      return res.status(204).send();
+    } catch (err) {
       return next(err);
     }
   }

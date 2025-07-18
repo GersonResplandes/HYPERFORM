@@ -14,10 +14,10 @@ studentsRoutes.get('/:id', (req, res, next) =>
   controller.getById(req, res, next)
 );
 studentsRoutes.put('/:id', (req, res, next) =>
-  controller.update(req, res, next)
+  controller.updateSecure(req, res, next)
 );
 studentsRoutes.delete('/:id', (req, res, next) =>
-  controller.delete(req, res, next)
+  controller.deleteSecure(req, res, next)
 );
 
 export { studentsRoutes };
