@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { StudentsRepository } from '../../infra/repositories/StudentsRepository';
 import { CreateStudentUseCase } from '../../domain/use-cases/CreateStudentUseCase';
 import { ListStudentsUseCase } from '../../domain/use-cases/ListStudentsUseCase';
+import { ListStudentsWithFiltersUseCase } from '../../domain/use-cases/ListStudentsWithFiltersUseCase';
 // import { GetStudentByIdUseCase } from '../../domain/use-cases/GetStudentByIdUseCase';
 import { UpdateStudentUseCase } from '../../domain/use-cases/UpdateStudentUseCase';
 import { DeleteStudentUseCase } from '../../domain/use-cases/DeleteStudentUseCase';
@@ -46,6 +47,32 @@ export class StudentsController {
       const result = await useCase.execute(user_id, page, limit);
       return res.json(result);
     } catch (err: any) {
+      return next(err);
+    }
+  }
+
+  async listWithFilters(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    try {
+      const userId = req.user.id;
+      const { page, limit, name, email, orderBy, orderDir } = req.query;
+      const useCase = new ListStudentsWithFiltersUseCase(
+        this.studentsRepository
+      );
+      const result = await useCase.execute({
+        userId,
+        page: page ? Number(page) : undefined,
+        limit: limit ? Number(limit) : undefined,
+        name: name ? String(name) : undefined,
+        email: email ? String(email) : undefined,
+        orderBy: orderBy ? (String(orderBy) as any) : undefined,
+        orderDir: orderDir ? (String(orderDir) as any) : undefined,
+      });
+      return res.json(result);
+    } catch (err) {
       return next(err);
     }
   }

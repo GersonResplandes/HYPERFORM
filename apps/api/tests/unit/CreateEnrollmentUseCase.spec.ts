@@ -97,6 +97,9 @@ describe('CreateEnrollmentUseCase', () => {
       return student;
     }
     async softDelete(): Promise<void> {}
+    async listWithFilters() {
+      return { data: [], pagination: { page: 1, limit: 10, total: 0 } };
+    }
   }
 
   class FakePlansRepository implements IPlansRepository {
