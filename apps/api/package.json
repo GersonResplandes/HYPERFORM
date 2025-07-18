@@ -8,14 +8,8 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "lint": "eslint src --ext .ts",
-    "lint:fix": "eslint src --ext .ts --fix",
     "format": "prettier --write \"src/**/*.{ts,js}\"",
-    "migrate": "knex migrate:latest",
-    "migrate:make": "knex migrate:make",
-    "seed": "knex seed:run"
+    "migrate": "knex migrate:latest"
   },
   "dependencies": {
     "axios": "^1.10.0",
@@ -32,8 +26,7 @@
     "mysql2": "^3.6.5",
     "reflect-metadata": "^0.1.13",
     "tsyringe": "^4.8.0",
-    "uuid": "^9.0.1",
-    "zod": "^4.0.5"
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
@@ -56,7 +49,8 @@
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.1",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "zod": "^4.0.5"
   },
   "keywords": [
     "api",

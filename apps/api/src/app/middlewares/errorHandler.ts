@@ -1,23 +1,33 @@
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '../../domain/errors/AppError';
 
+const errorIcon = '❌';
+
 export function errorHandler(
-  error: Error,
-  request: Request,
-  response: Response,
+  err: any,
+  req: Request,
+  res: Response,
   next: NextFunction
-): Response {
-  if (error instanceof AppError) {
-    return response.status(error.statusCode).json({
-      status: 'error',
-      message: error.message,
+) {
+  // Log só a mensagem principal no terminal
+  console.error(
+    `${errorIcon} [${new Date().toISOString()}] ${req.method} ${req.originalUrl}`
+  );
+  console.error(`${errorIcon} ${err.message}`);
+
+  // Resposta amigável para o cliente
+  if (err instanceof AppError) {
+    return res.status(err.statusCode).json({
+      error: err.message,
+      status: err.statusCode,
+      icon: errorIcon,
     });
   }
 
-  console.error(error);
-
-  return response.status(500).json({
-    status: 'error',
-    message: 'Erro interno do servidor',
+  // Erro inesperado
+  return res.status(500).json({
+    error: 'Erro interno do servidor',
+    status: 500,
+    icon: errorIcon,
   });
 }

@@ -1,8 +1,10 @@
 import { z } from 'zod';
 
+const uuidRegex =
+  /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
 const createEnrollmentSchema = z.object({
-  student_id: z.string().uuid(),
-  plan_id: z.string().uuid(),
+  student_id: z.string().regex(uuidRegex, 'Invalid UUID'),
+  plan_id: z.string().regex(uuidRegex, 'Invalid UUID'),
   start_date: z.coerce.date(),
 });
 

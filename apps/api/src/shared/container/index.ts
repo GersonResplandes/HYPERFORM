@@ -16,6 +16,12 @@ import { PlansRepository } from '../../infra/repositories/PlansRepository';
 import { IEnrollmentsRepository } from '../../domain/repositories/IEnrollmentsRepository';
 import { EnrollmentsRepository } from '../../infra/repositories/EnrollmentsRepository';
 
+import { IStudentsRepository } from '../../domain/repositories/IStudentsRepository';
+import { StudentsRepository } from '../../infra/repositories/StudentsRepository';
+
+import { IAttendancesRepository } from '../../domain/repositories/IAttendancesRepository';
+import { AttendancesRepository } from '../../infra/repositories/AttendancesRepository';
+
 import { CacheProvider } from '../../infra/providers/CacheProvider';
 
 container.registerSingleton<IUsersRepository>(
@@ -31,5 +37,13 @@ container.registerSingleton<IPlansRepository>(
 container.registerSingleton<IEnrollmentsRepository>(
   'EnrollmentsRepository',
   EnrollmentsRepository
+);
+container.registerSingleton<IStudentsRepository>(
+  'StudentsRepository',
+  StudentsRepository
+);
+container.registerSingleton<IAttendancesRepository>(
+  'AttendancesRepository',
+  AttendancesRepository
 );
 container.registerSingleton<CacheProvider>('CacheProvider', CacheProvider);
