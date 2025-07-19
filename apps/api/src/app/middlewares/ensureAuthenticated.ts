@@ -27,7 +27,7 @@ export async function ensureAuthenticated(
   const authHeader = request.headers.authorization;
 
   if (!authHeader) {
-    return next(new AppError('Token não fornecido', 401));
+    throw new AppError('Token não fornecido', 401);
   }
 
   const [, token] = authHeader.split(' ');
@@ -45,6 +45,6 @@ export async function ensureAuthenticated(
 
     return next();
   } catch {
-    return next(new AppError('Token inválido', 401));
+    throw new AppError('Token inválido', 401);
   }
 }

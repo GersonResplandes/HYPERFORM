@@ -1,12 +1,14 @@
+import 'reflect-metadata';
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { routes } from './app/routes';
 import { errorHandler } from './app/middlewares/errorHandler';
+import './shared/container';
 
 dotenv.config();
 
-const app = express();
+export const app = express();
 app.use(cors());
 app.use(express.json());
 
@@ -25,7 +27,7 @@ app.use((req, res, next) => {
 
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`API rodando na porta ${PORT}`);
 });

@@ -93,7 +93,7 @@ Authorization: Bearer <seu_token_jwt>
 
 ### 3. Detalhes de um Aluno
 
-**GET** `/students/:id`
+**GET** `/students/?page=1&limit=10`
 
 #### Response (200 OK)
 

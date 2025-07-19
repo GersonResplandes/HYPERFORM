@@ -53,9 +53,6 @@ class FakeStudentsRepository implements IStudentsRepository {
     );
     if (student) student.deleted_at = new Date();
   }
-  async listWithFilters() {
-    return { data: [], pagination: { page: 1, limit: 10, total: 0 } };
-  }
 }
 
 describe('UpdateStudentUseCase', () => {

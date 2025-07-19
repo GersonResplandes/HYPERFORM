@@ -46,14 +46,12 @@ describe('CreateEnrollmentUseCase', () => {
     async findActiveByStudentId(
       student_id: string
     ): Promise<Enrollment | null> {
-      const now = new Date();
       return (
         this.enrollments.find(
           (e) =>
             e.student_id === student_id &&
             !e.deleted_at &&
-            e.start_date <= now &&
-            e.end_date >= now
+            e.end_date >= new Date()
         ) || null
       );
     }
@@ -97,9 +95,6 @@ describe('CreateEnrollmentUseCase', () => {
       return student;
     }
     async softDelete(): Promise<void> {}
-    async listWithFilters() {
-      return { data: [], pagination: { page: 1, limit: 10, total: 0 } };
-    }
   }
 
   class FakePlansRepository implements IPlansRepository {
@@ -144,12 +139,10 @@ describe('CreateEnrollmentUseCase', () => {
   });
 
   it('deve criar uma matrícula válida', async () => {
-    const validUserId = '550e8400-e29b-41d4-a716-446655440000';
     const enrollment = await createEnrollmentUseCase.execute({
       student_id: 'a3e1b2c4-5d6f-4a7b-8c9d-0e1f2a3b4c5d',
       plan_id: 'b4c5d6e7-8f9a-4b1c-2d3e-4f5a6b7c8d9e',
       start_date: '2024-08-01T00:00:00.000Z',
-      user_id: validUserId,
     });
     expect(enrollment).toHaveProperty('id');
     expect(enrollment.student_id).toBe('a3e1b2c4-5d6f-4a7b-8c9d-0e1f2a3b4c5d');
@@ -159,28 +152,21 @@ describe('CreateEnrollmentUseCase', () => {
   });
 
   it('não deve permitir matrícula duplicada ativa', async () => {
-    const validUserId = '550e8400-e29b-41d4-a716-446655440000';
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
     await createEnrollmentUseCase.execute({
       student_id: 'a3e1b2c4-5d6f-4a7b-8c9d-0e1f2a3b4c5d',
       plan_id: 'b4c5d6e7-8f9a-4b1c-2d3e-4f5a6b7c8d9e',
-      start_date: today.toISOString(),
-      user_id: validUserId,
+      start_date: '2024-08-01T00:00:00.000Z',
     });
     await expect(
       createEnrollmentUseCase.execute({
         student_id: 'a3e1b2c4-5d6f-4a7b-8c9d-0e1f2a3b4c5d',
         plan_id: 'b4c5d6e7-8f9a-4b1c-2d3e-4f5a6b7c8d9e',
-        start_date: tomorrow.toISOString(),
-        user_id: validUserId,
+        start_date: '2024-09-01T00:00:00.000Z',
       })
     ).rejects.toThrow('Aluno já possui matrícula ativa');
   });
 
   it('deve validar aluno existente', async () => {
-    const validUserId = '550e8400-e29b-41d4-a716-446655440000';
     const fakeStudents = new FakeStudentsRepository();
     fakeStudents.students = [];
     const useCase = new CreateEnrollmentUseCase(
@@ -193,13 +179,11 @@ describe('CreateEnrollmentUseCase', () => {
         student_id: 'c5d6e7f8-9a0b-4c1d-2e3f-4a5b6c7d8e9f', // UUID v4 válido
         plan_id: 'b4c5d6e7-8f9a-4b1c-2d3e-4f5a6b7c8d9e',
         start_date: '2025-07-17T21:16:35.058Z',
-        user_id: validUserId,
       })
     ).rejects.toThrow('Aluno não encontrado');
   });
 
   it('deve validar plano existente', async () => {
-    const validUserId = '550e8400-e29b-41d4-a716-446655440000';
     const fakePlans = new FakePlansRepository();
     fakePlans.plans = [];
     const useCase = new CreateEnrollmentUseCase(
@@ -212,19 +196,16 @@ describe('CreateEnrollmentUseCase', () => {
         student_id: 'a3e1b2c4-5d6f-4a7b-8c9d-0e1f2a3b4c5d',
         plan_id: 'c5d6e7f8-9a0b-4c1d-2e3f-4a5b6c7d8e9f', // UUID v4 válido
         start_date: '2025-07-17T21:16:35.058Z',
-        user_id: validUserId,
       })
     ).rejects.toThrow('Plano não encontrado');
   });
 
   it('deve validar campos obrigatórios', async () => {
-    const validUserId = '550e8400-e29b-41d4-a716-446655440000';
     await expect(
       createEnrollmentUseCase.execute({
         student_id: '',
         plan_id: '',
         start_date: '',
-        user_id: validUserId,
       })
     ).rejects.toThrow();
   });

@@ -1,9 +1,5 @@
 import { Student } from '../../domain/entities/Student';
-import {
-  IStudentsRepository,
-  ListStudentsFilters,
-  ListStudentsResult,
-} from '../../domain/repositories/IStudentsRepository';
+import { IStudentsRepository } from '../../domain/repositories/IStudentsRepository';
 import { DatabaseConnection } from '../database/connection';
 
 export class StudentsRepository implements IStudentsRepository {
@@ -83,57 +79,5 @@ export class StudentsRepository implements IStudentsRepository {
     await this.knex('students')
       .where({ id, user_id: userId })
       .update({ deleted_at: new Date() });
-  }
-
-  async listWithFilters(
-    filters: ListStudentsFilters
-  ): Promise<ListStudentsResult> {
-    const {
-      userId,
-      page = 1,
-      limit = 10,
-      name,
-      email,
-      orderBy = 'created_at',
-      orderDir = 'asc',
-    } = filters;
-
-    const allowedOrderFields = ['name', 'email', 'created_at'];
-    const orderField = allowedOrderFields.includes(orderBy)
-      ? orderBy
-      : 'created_at';
-    const orderDirection = orderDir === 'desc' ? 'desc' : 'asc';
-
-    const query = this.knex('students')
-      .where({ user_id: userId })
-      .whereNull('deleted_at');
-
-    if (name) {
-      query.andWhereRaw('LOWER(name) LIKE ?', [`%${name.toLowerCase()}%`]);
-    }
-    if (email) {
-      query.andWhere('email', 'like', `%${email}%`);
-    }
-
-    const totalQuery = query.clone();
-    const totalResult =
-      await totalQuery.count<{ count: string }[]>('id as count');
-    const total = Number(totalResult[0]?.count || 0);
-
-    const data = await query
-      .clone()
-      .orderBy(orderField, orderDirection)
-      .limit(limit)
-      .offset((page - 1) * limit)
-      .select(['id', 'name', 'email', 'created_at']);
-
-    return {
-      data,
-      pagination: {
-        page,
-        limit,
-        total,
-      },
-    };
   }
 }

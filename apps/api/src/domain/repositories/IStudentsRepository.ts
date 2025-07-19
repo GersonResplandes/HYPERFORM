@@ -32,5 +32,4 @@ export interface IStudentsRepository {
   countByUser(userId: string): Promise<number>;
   update(student: Student): Promise<Student>;
   softDelete(id: string, userId: string): Promise<void>;
-  listWithFilters(filters: ListStudentsFilters): Promise<ListStudentsResult>;
 }

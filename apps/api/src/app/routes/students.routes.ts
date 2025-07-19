@@ -1,23 +1,14 @@
 import { Router } from 'express';
-import { StudentsController } from '../controllers/StudentsController';
 import { ensureAuthenticated } from '../middlewares/ensureAuthenticated';
+import { StudentsController } from '../controllers/StudentsController';
 
 const studentsRoutes = Router();
 const controller = new StudentsController();
 
 studentsRoutes.use(ensureAuthenticated);
-studentsRoutes.post('/', (req, res, next) => controller.create(req, res, next));
-studentsRoutes.get('/', (req, res, next) =>
-  controller.listWithFilters(req, res, next)
-);
-studentsRoutes.get('/:id', (req, res, next) =>
-  controller.getById(req, res, next)
-);
-studentsRoutes.put('/:id', (req, res, next) =>
-  controller.updateSecure(req, res, next)
-);
-studentsRoutes.delete('/:id', (req, res, next) =>
-  controller.deleteSecure(req, res, next)
-);
+studentsRoutes.post('/', (req, res) => controller.create(req, res));
+studentsRoutes.get('/', (req, res) => controller.list(req, res));
+studentsRoutes.put('/:id', (req, res) => controller.update(req, res));
+studentsRoutes.delete('/:id', (req, res) => controller.delete(req, res));
 
 export { studentsRoutes };

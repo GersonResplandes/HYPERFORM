@@ -19,9 +19,6 @@ import { EnrollmentsRepository } from '../../infra/repositories/EnrollmentsRepos
 import { IStudentsRepository } from '../../domain/repositories/IStudentsRepository';
 import { StudentsRepository } from '../../infra/repositories/StudentsRepository';
 
-import { IAttendancesRepository } from '../../domain/repositories/IAttendancesRepository';
-import { AttendancesRepository } from '../../infra/repositories/AttendancesRepository';
-
 import { CacheProvider } from '../../infra/providers/CacheProvider';
 
 container.registerSingleton<IUsersRepository>(
@@ -41,9 +38,5 @@ container.registerSingleton<IEnrollmentsRepository>(
 container.registerSingleton<IStudentsRepository>(
   'StudentsRepository',
   StudentsRepository
-);
-container.registerSingleton<IAttendancesRepository>(
-  'AttendancesRepository',
-  AttendancesRepository
 );
 container.registerSingleton<CacheProvider>('CacheProvider', CacheProvider);

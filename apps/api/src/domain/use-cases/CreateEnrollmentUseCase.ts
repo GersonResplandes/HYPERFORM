@@ -6,11 +6,9 @@ import { IPlansRepository } from '../repositories/IPlansRepository';
 import { z } from 'zod';
 import { AppError } from '../errors/AppError';
 
-const uuidRegex =
-  /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
 const createEnrollmentSchema = z.object({
-  student_id: z.string().regex(uuidRegex, 'Invalid UUID'),
-  plan_id: z.string().regex(uuidRegex, 'Invalid UUID'),
+  student_id: z.string().uuid(),
+  plan_id: z.string().uuid(),
   start_date: z.coerce.date(),
 });
 
@@ -18,7 +16,6 @@ interface CreateEnrollmentDTO {
   student_id: string;
   plan_id: string;
   start_date: Date | string;
-  user_id: string;
 }
 
 @injectable()
@@ -44,7 +41,7 @@ export class CreateEnrollmentUseCase {
     // Verifica se aluno existe
     const student = await this.studentsRepository.findById(
       data.student_id,
-      data.user_id
+      '' // userId não é relevante para matrícula
     );
     if (!student) {
       throw new AppError('Aluno não encontrado', 404);
