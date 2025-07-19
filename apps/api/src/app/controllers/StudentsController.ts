@@ -5,6 +5,7 @@ import { ListStudentsUseCase } from '../../domain/use-cases/ListStudentsUseCase'
 import { UpdateStudentUseCase } from '../../domain/use-cases/UpdateStudentUseCase';
 import { DeleteStudentUseCase } from '../../domain/use-cases/DeleteStudentUseCase';
 import { CheckActiveEnrollmentUseCase } from '../../domain/use-cases/CheckActiveEnrollmentUseCase';
+import { CheckInUseCase } from '../../domain/use-cases/CheckInUseCase';
 import { container } from 'tsyringe';
 
 export class StudentsController {
@@ -87,6 +88,29 @@ export class StudentsController {
     } catch (err: any) {
       if (err.statusCode === 404) {
         return res.status(404).json({ error: err.message });
+      }
+      return res.status(400).json({ error: err.message });
+    }
+  }
+
+  async checkIn(req: Request, res: Response) {
+    try {
+      const user_id = req.user.id;
+      const { id: student_id } = req.params;
+      const useCase = container.resolve(CheckInUseCase);
+      await useCase.execute({ student_id, user_id });
+      return res
+        .status(201)
+        .json({ message: 'Check-in realizado com sucesso' });
+    } catch (err: any) {
+      if (err.statusCode === 404) {
+        return res.status(404).json({ error: err.message });
+      }
+      if (err.statusCode === 403) {
+        return res.status(403).json({ error: err.message });
+      }
+      if (err.statusCode === 409) {
+        return res.status(409).json({ error: err.message });
       }
       return res.status(400).json({ error: err.message });
     }
