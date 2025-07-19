@@ -1,6 +1,10 @@
 import { injectable } from 'tsyringe';
 import { v4 as uuidv4 } from 'uuid';
-import { ICheckInsRepository } from '../../domain/repositories/ICheckInsRepository';
+import {
+  ICheckInsRepository,
+  ListCheckInsParams,
+  ListCheckInsResult,
+} from '../../domain/repositories/ICheckInsRepository';
 import { CheckIn } from '../../domain/entities/CheckIn';
 import { DatabaseConnection } from '../database/connection';
 
@@ -61,5 +65,39 @@ export class CheckInsRepository implements ICheckInsRepository {
           created_at: checkIn.created_at,
         }
       : null;
+  }
+
+  async listByStudent(params: ListCheckInsParams): Promise<ListCheckInsResult> {
+    const { student_id, page, limit, date } = params;
+    let query = this.db('check_ins').where('student_id', student_id);
+    let countQuery = this.db('check_ins').where('student_id', student_id);
+    if (date) {
+      // Filtro por data UTC
+      const [year, month, day] = date.split('-').map(Number);
+      const start = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
+      const end = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999));
+      query = query
+        .andWhere('created_at', '>=', start)
+        .andWhere('created_at', '<=', end);
+      countQuery = countQuery
+        .andWhere('created_at', '>=', start)
+        .andWhere('created_at', '<=', end);
+    }
+    const totalResult = await countQuery.count('id as count');
+    const total = Number(totalResult[0]?.count || 0);
+    const checkIns = await query
+      .orderBy('created_at', 'desc')
+      .limit(limit)
+      .offset((page - 1) * limit);
+    return {
+      checkIns: checkIns.map((c: any) => ({
+        checkInId: c.id,
+        createdAt: c.created_at.toISOString(),
+        studentId: c.student_id,
+      })),
+      total,
+      page,
+      limit,
+    };
   }
 }

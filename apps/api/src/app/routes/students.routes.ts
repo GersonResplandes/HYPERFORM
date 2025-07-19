@@ -16,5 +16,8 @@ studentsRoutes.post('/:id/check-in', (req, res) =>
 );
 studentsRoutes.put('/:id', (req, res) => controller.update(req, res));
 studentsRoutes.delete('/:id', (req, res) => controller.delete(req, res));
+studentsRoutes.get('/:id/check-ins', (req, res) =>
+  controller.listCheckIns(req, res)
+);
 
 export { studentsRoutes };

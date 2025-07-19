@@ -6,6 +6,7 @@ import { UpdateStudentUseCase } from '../../domain/use-cases/UpdateStudentUseCas
 import { DeleteStudentUseCase } from '../../domain/use-cases/DeleteStudentUseCase';
 import { CheckActiveEnrollmentUseCase } from '../../domain/use-cases/CheckActiveEnrollmentUseCase';
 import { CheckInUseCase } from '../../domain/use-cases/CheckInUseCase';
+import { ListStudentCheckInsUseCase } from '../../domain/use-cases/ListStudentCheckInsUseCase';
 import { container } from 'tsyringe';
 
 export class StudentsController {
@@ -111,6 +112,30 @@ export class StudentsController {
       }
       if (err.statusCode === 409) {
         return res.status(409).json({ error: err.message });
+      }
+      return res.status(400).json({ error: err.message });
+    }
+  }
+
+  async listCheckIns(req: Request, res: Response) {
+    try {
+      const user_id = req.user.id;
+      const { id: student_id } = req.params;
+      const page = req.query.page ? Number(req.query.page) : 1;
+      const limit = req.query.limit ? Number(req.query.limit) : 10;
+      const date = req.query.date ? String(req.query.date) : undefined;
+      const useCase = container.resolve(ListStudentCheckInsUseCase);
+      const result = await useCase.execute({
+        student_id,
+        user_id,
+        page,
+        limit,
+        date,
+      });
+      return res.json(result);
+    } catch (err: any) {
+      if (err.statusCode === 404) {
+        return res.status(404).json({ error: err.message });
       }
       return res.status(400).json({ error: err.message });
     }
