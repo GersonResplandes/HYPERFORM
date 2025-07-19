@@ -77,6 +77,20 @@ describe('CreateEnrollmentUseCase', () => {
         ) || null
       );
     }
+
+    async hasActiveEnrollment(
+      student_id: string,
+      user_id: string
+    ): Promise<boolean> {
+      const now = new Date();
+      return this.enrollments.some(
+        (e) =>
+          e.student_id === student_id &&
+          !e.deleted_at &&
+          e.start_date <= now &&
+          e.end_date >= now
+      );
+    }
   }
 
   class FakeStudentsRepository implements IStudentsRepository {

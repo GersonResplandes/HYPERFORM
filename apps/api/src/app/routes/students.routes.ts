@@ -8,6 +8,9 @@ const controller = new StudentsController();
 studentsRoutes.use(ensureAuthenticated);
 studentsRoutes.post('/', (req, res) => controller.create(req, res));
 studentsRoutes.get('/', (req, res) => controller.list(req, res));
+studentsRoutes.get('/:id/active-enrollment', (req, res) =>
+  controller.activeEnrollment(req, res)
+);
 studentsRoutes.put('/:id', (req, res) => controller.update(req, res));
 studentsRoutes.delete('/:id', (req, res) => controller.delete(req, res));
 

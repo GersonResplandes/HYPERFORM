@@ -15,4 +15,5 @@ export interface IEnrollmentsRepository {
     student_id: string,
     startDate?: Date
   ): Promise<Enrollment | null>;
+  hasActiveEnrollment(student_id: string, user_id: string): Promise<boolean>;
 }

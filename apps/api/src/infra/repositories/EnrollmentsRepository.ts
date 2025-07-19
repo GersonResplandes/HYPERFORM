@@ -111,6 +111,24 @@ export class EnrollmentsRepository implements IEnrollmentsRepository {
     return enrollment ? this.map(enrollment) : null;
   }
 
+  async hasActiveEnrollment(
+    student_id: string,
+    user_id: string
+  ): Promise<boolean> {
+    const now = new Date();
+    const result = await this.db('enrollments as e')
+      .join('students as s', 'e.student_id', 's.id')
+      .where({
+        'e.student_id': student_id,
+        's.user_id': user_id,
+        'e.deleted_at': null,
+      })
+      .andWhere('e.start_date', '<=', now)
+      .andWhere('e.end_date', '>=', now)
+      .first();
+    return !!result;
+  }
+
   private map(enrollment: any): Enrollment {
     return {
       id: enrollment.id,

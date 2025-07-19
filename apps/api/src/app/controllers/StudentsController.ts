@@ -4,6 +4,8 @@ import { CreateStudentUseCase } from '../../domain/use-cases/CreateStudentUseCas
 import { ListStudentsUseCase } from '../../domain/use-cases/ListStudentsUseCase';
 import { UpdateStudentUseCase } from '../../domain/use-cases/UpdateStudentUseCase';
 import { DeleteStudentUseCase } from '../../domain/use-cases/DeleteStudentUseCase';
+import { CheckActiveEnrollmentUseCase } from '../../domain/use-cases/CheckActiveEnrollmentUseCase';
+import { container } from 'tsyringe';
 
 export class StudentsController {
   private studentsRepository = new StudentsRepository();
@@ -72,6 +74,21 @@ export class StudentsController {
       return res.status(204).send();
     } catch (err: any) {
       return res.status(404).json({ error: err.message });
+    }
+  }
+
+  async activeEnrollment(req: Request, res: Response) {
+    try {
+      const user_id = req.user.id;
+      const { id: student_id } = req.params;
+      const useCase = container.resolve(CheckActiveEnrollmentUseCase);
+      const result = await useCase.execute({ student_id, user_id });
+      return res.json(result);
+    } catch (err: any) {
+      if (err.statusCode === 404) {
+        return res.status(404).json({ error: err.message });
+      }
+      return res.status(400).json({ error: err.message });
     }
   }
 }

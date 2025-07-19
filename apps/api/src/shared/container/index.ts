@@ -20,6 +20,7 @@ import { IStudentsRepository } from '../../domain/repositories/IStudentsReposito
 import { StudentsRepository } from '../../infra/repositories/StudentsRepository';
 
 import { CacheProvider } from '../../infra/providers/CacheProvider';
+import { CheckActiveEnrollmentUseCase } from '../../domain/use-cases/CheckActiveEnrollmentUseCase';
 
 container.registerSingleton<IUsersRepository>(
   'UsersRepository',
@@ -40,3 +41,7 @@ container.registerSingleton<IStudentsRepository>(
   StudentsRepository
 );
 container.registerSingleton<CacheProvider>('CacheProvider', CacheProvider);
+container.registerSingleton(
+  'CheckActiveEnrollmentUseCase',
+  CheckActiveEnrollmentUseCase
+);
