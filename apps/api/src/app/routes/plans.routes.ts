@@ -8,7 +8,7 @@ const controller = new PlansController();
 plansRoutes.use(ensureAuthenticated);
 plansRoutes.post('/', controller.create);
 plansRoutes.get('/', controller.list);
-plansRoutes.get('/:id', controller.getById);
+plansRoutes.get('/:id', controller.show);
 plansRoutes.put('/:id', controller.update);
 plansRoutes.delete('/:id', controller.delete);
 

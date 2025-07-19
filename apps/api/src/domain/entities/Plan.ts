@@ -1,8 +1,10 @@
 export interface Plan {
   id: string;
-  name: string;
-  duration: number; // em dias
+  title: string;
+  description: string;
   price: number;
+  duration: number;
+  user_id: string;
   created_at: Date;
-  deleted_at?: Date | null;
+  updated_at: Date;
 }

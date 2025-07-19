@@ -10,8 +10,8 @@ export class GetEnrollmentByIdUseCase {
     private enrollmentsRepository: IEnrollmentsRepository
   ) {}
 
-  async execute(id: string): Promise<Enrollment> {
-    const enrollment = await this.enrollmentsRepository.findById(id);
+  async execute(id: string, user_id: string): Promise<Enrollment> {
+    const enrollment = await this.enrollmentsRepository.findById(id, user_id);
     if (!enrollment) {
       throw new AppError('Matrícula não encontrada', 404);
     }

@@ -2,9 +2,9 @@ import { Plan } from '../entities/Plan';
 
 export interface IPlansRepository {
   create(plan: Plan): Promise<Plan>;
-  findById(id: string): Promise<Plan | null>;
+  findById(id: string, user_id: string): Promise<Plan | null>;
   findByName(name: string): Promise<Plan | null>;
-  list(): Promise<Plan[]>;
+  listByUser(user_id: string): Promise<Plan[]>;
   update(plan: Plan): Promise<Plan>;
   softDelete(id: string): Promise<void>;
 }

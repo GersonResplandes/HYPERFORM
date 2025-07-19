@@ -7,6 +7,7 @@ interface ListEnrollmentsResult {
   total: number;
   page: number;
   limit: number;
+  totalPages: number;
 }
 
 @injectable()
@@ -16,9 +17,25 @@ export class ListEnrollmentsUseCase {
     private enrollmentsRepository: IEnrollmentsRepository
   ) {}
 
-  async execute(page = 1, limit = 10): Promise<ListEnrollmentsResult> {
-    const enrollments = await this.enrollmentsRepository.list(page, limit);
-    const total = await this.enrollmentsRepository.count();
-    return { enrollments, total, page, limit };
+  async execute(
+    user_id: string,
+    page = 1,
+    limit = 10
+  ): Promise<ListEnrollmentsResult> {
+    const enrollments = await this.enrollmentsRepository.listByUser(
+      user_id,
+      page,
+      limit
+    );
+    const total = await this.enrollmentsRepository.countByUser(user_id);
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      enrollments,
+      total,
+      page,
+      limit,
+      totalPages,
+    };
   }
 }

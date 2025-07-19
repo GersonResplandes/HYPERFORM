@@ -25,31 +25,49 @@ export class EnrollmentsRepository implements IEnrollmentsRepository {
       created_at: now,
       deleted_at: null,
     });
-    return this.findById(id) as Promise<Enrollment>;
+    return this.findById(id, '') as Promise<Enrollment>;
   }
 
-  async findById(id: string): Promise<Enrollment | null> {
-    const enrollment = await this.db('enrollments')
-      .where({ id, deleted_at: null })
+  async findById(id: string, user_id: string): Promise<Enrollment | null> {
+    const enrollment = await this.db('enrollments as e')
+      .join('students as s', 'e.student_id', 's.id')
+      .where({
+        'e.id': id,
+        'e.deleted_at': null,
+        's.user_id': user_id,
+      })
       .first();
     return enrollment ? this.map(enrollment) : null;
   }
 
-  async list(page: number, limit: number): Promise<Enrollment[]> {
+  async listByUser(
+    user_id: string,
+    page: number,
+    limit: number
+  ): Promise<Enrollment[]> {
     const offset = (page - 1) * limit;
-    const enrollments = await this.db('enrollments')
-      .where({ deleted_at: null })
+    const enrollments = await this.db('enrollments as e')
+      .join('students as s', 'e.student_id', 's.id')
+      .where({
+        'e.deleted_at': null,
+        's.user_id': user_id,
+      })
+      .orderBy('e.created_at', 'desc')
       .limit(limit)
       .offset(offset);
     return enrollments.map(this.map);
   }
 
-  async count(): Promise<number> {
-    const result = await this.db('enrollments')
-      .where({ deleted_at: null })
-      .count('id as count')
+  async countByUser(user_id: string): Promise<number> {
+    const result = await this.db('enrollments as e')
+      .join('students as s', 'e.student_id', 's.id')
+      .where({
+        'e.deleted_at': null,
+        's.user_id': user_id,
+      })
+      .count('* as total')
       .first();
-    return Number(result?.count || 0);
+    return result ? result.total : 0;
   }
 
   async update(enrollment: Enrollment): Promise<Enrollment> {
@@ -62,19 +80,33 @@ export class EnrollmentsRepository implements IEnrollmentsRepository {
         end_date: enrollment.end_date,
         price: enrollment.price,
       });
-    return this.findById(enrollment.id) as Promise<Enrollment>;
+    return this.findById(enrollment.id, '') as Promise<Enrollment>;
   }
 
   async softDelete(id: string): Promise<void> {
     await this.db('enrollments')
-      .where({ id, deleted_at: null })
+      .where({ id })
       .update({ deleted_at: new Date() });
   }
 
-  async findActiveByStudentId(student_id: string): Promise<Enrollment | null> {
+  async findActiveByStudentId(
+    student_id: string,
+    startDate?: Date
+  ): Promise<Enrollment | null> {
+    if (startDate) {
+      // Busca matrícula ativa que sobrepõe a data informada
+      const enrollment = await this.db('enrollments')
+        .where({ student_id, deleted_at: null })
+        .andWhere('start_date', '<=', startDate)
+        .andWhere('end_date', '>', startDate)
+        .first();
+      return enrollment ? this.map(enrollment) : null;
+    }
+    // Comportamento antigo: matrícula ativa no momento atual
+    const now = new Date();
     const enrollment = await this.db('enrollments')
       .where({ student_id, deleted_at: null })
-      .andWhere('end_date', '>=', new Date())
+      .andWhere('end_date', '>=', now)
       .first();
     return enrollment ? this.map(enrollment) : null;
   }

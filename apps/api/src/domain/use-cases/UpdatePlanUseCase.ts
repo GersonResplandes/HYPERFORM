@@ -1,20 +1,25 @@
-import { injectable, inject } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 import { IPlansRepository } from '../repositories/IPlansRepository';
 import { Plan } from '../entities/Plan';
-import { z } from 'zod';
 import { AppError } from '../errors/AppError';
+import { z } from 'zod';
 
 const updatePlanSchema = z.object({
-  name: z.string().min(3, 'Nome do plano deve ter pelo menos 3 caracteres'),
-  duration: z.number().int().positive('Duração deve ser positiva'),
-  price: z.number().positive('Preço deve ser positivo'),
+  id: z.string().uuid(),
+  user_id: z.string().uuid(),
+  title: z.string().min(3).optional(),
+  description: z.string().min(5).optional(),
+  price: z.number().positive().optional(),
+  duration: z.number().int().positive().optional(),
 });
 
 interface UpdatePlanDTO {
   id: string;
-  name: string;
-  duration: number;
-  price: number;
+  user_id: string;
+  title?: string;
+  description?: string;
+  price?: number;
+  duration?: number;
 }
 
 @injectable()
@@ -32,17 +37,15 @@ export class UpdatePlanUseCase {
         400
       );
     }
-    const plan = await this.plansRepository.findById(data.id);
+    const plan = await this.plansRepository.findById(data.id, data.user_id);
     if (!plan) {
       throw new AppError('Plano não encontrado', 404);
     }
-    const exists = await this.plansRepository.findByName(data.name);
-    if (exists && exists.id !== data.id) {
-      throw new AppError('Já existe um plano com esse nome', 400);
-    }
-    plan.name = data.name;
-    plan.duration = data.duration;
-    plan.price = data.price;
+    if (data.title) plan.title = data.title;
+    if (data.description) plan.description = data.description;
+    if (data.price) plan.price = data.price;
+    if (data.duration) plan.duration = data.duration;
+    plan.updated_at = new Date();
     return this.plansRepository.update(plan);
   }
 }

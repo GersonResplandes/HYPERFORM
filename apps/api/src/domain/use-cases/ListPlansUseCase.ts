@@ -1,4 +1,4 @@
-import { injectable, inject } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 import { IPlansRepository } from '../repositories/IPlansRepository';
 import { Plan } from '../entities/Plan';
 
@@ -9,7 +9,7 @@ export class ListPlansUseCase {
     private plansRepository: IPlansRepository
   ) {}
 
-  async execute(): Promise<Plan[]> {
-    return this.plansRepository.list();
+  async execute(user_id: string): Promise<Plan[]> {
+    return this.plansRepository.listByUser(user_id);
   }
 }

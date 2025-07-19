@@ -10,8 +10,8 @@ export class GetPlanByIdUseCase {
     private plansRepository: IPlansRepository
   ) {}
 
-  async execute(id: string): Promise<Plan> {
-    const plan = await this.plansRepository.findById(id);
+  async execute(id: string, user_id: string): Promise<Plan> {
+    const plan = await this.plansRepository.findById(id, user_id);
     if (!plan) {
       throw new AppError('Plano não encontrado', 404);
     }

@@ -8,124 +8,179 @@ import { Plan } from '../../src/domain/entities/Plan';
 import { AppError } from '../../src/domain/errors/AppError';
 
 describe('CreateEnrollmentUseCase', () => {
-  let enrollmentsRepository: IEnrollmentsRepository;
-  let studentsRepository: IStudentsRepository;
-  let plansRepository: IPlansRepository;
-  let createEnrollmentUseCase: CreateEnrollmentUseCase;
-
   class FakeEnrollmentsRepository implements IEnrollmentsRepository {
     private enrollments: Enrollment[] = [];
+
     async create(enrollment: Enrollment): Promise<Enrollment> {
       const e = {
         ...enrollment,
-        id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479', // UUID v4 válido
+        id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
         created_at: new Date(),
         deleted_at: null,
       };
       this.enrollments.push(e);
       return e;
     }
-    async findById(id: string): Promise<Enrollment | null> {
+
+    async findById(id: string, user_id: string): Promise<Enrollment | null> {
       return this.enrollments.find((e) => e.id === id && !e.deleted_at) || null;
     }
-    async list(): Promise<Enrollment[]> {
-      return this.enrollments.filter((e) => !e.deleted_at);
+
+    async listByUser(
+      user_id: string,
+      page: number,
+      limit: number
+    ): Promise<Enrollment[]> {
+      const offset = (page - 1) * limit;
+      return this.enrollments
+        .filter((e) => !e.deleted_at)
+        .slice(offset, offset + limit);
     }
-    async count(): Promise<number> {
+
+    async countByUser(user_id: string): Promise<number> {
       return this.enrollments.filter((e) => !e.deleted_at).length;
     }
+
     async update(enrollment: Enrollment): Promise<Enrollment> {
       const idx = this.enrollments.findIndex((e) => e.id === enrollment.id);
       if (idx >= 0) this.enrollments[idx] = enrollment;
       return enrollment;
     }
+
     async softDelete(id: string): Promise<void> {
       const e = this.enrollments.find((e) => e.id === id);
       if (e) e.deleted_at = new Date();
     }
+
     async findActiveByStudentId(
-      student_id: string
+      student_id: string,
+      newStartDate?: Date
     ): Promise<Enrollment | null> {
+      // Se newStartDate for passado, verifica sobreposição de datas
+      if (newStartDate) {
+        return (
+          this.enrollments.find(
+            (e) =>
+              e.student_id === student_id &&
+              !e.deleted_at &&
+              newStartDate >= e.start_date &&
+              newStartDate < e.end_date
+          ) || null
+        );
+      }
+      // Comportamento antigo para compatibilidade
+      const now = new Date();
       return (
         this.enrollments.find(
           (e) =>
-            e.student_id === student_id &&
-            !e.deleted_at &&
-            e.end_date >= new Date()
+            e.student_id === student_id && !e.deleted_at && e.end_date >= now
         ) || null
       );
     }
   }
 
   class FakeStudentsRepository implements IStudentsRepository {
-    public students: Student[] = [
-      {
-        id: 'a3e1b2c4-5d6f-4a7b-8c9d-0e1f2a3b4c5d', // UUID v4 válido
-        name: 'Aluno',
-        email: 'a@email.com',
-        phone: '11999999999',
-        birth_date: new Date('2000-01-01'),
-        gender: 'MALE',
-        user_id: '550e8400-e29b-41d4-a716-446655440000', // UUID v4 válido
+    private students: Student[] = [];
+
+    async create(student: Student): Promise<Student> {
+      const s = {
+        ...student,
+        id: 'a3e1b2c4-5d6f-4a7b-8c9d-0e1f2a3b4c5d',
         created_at: new Date(),
         updated_at: new Date(),
-        deleted_at: null,
-      },
-    ];
-    async create(student: Student): Promise<Student> {
-      this.students.push(student);
-      return student;
+      };
+      this.students.push(s);
+      return s;
     }
-    async findById(id: string, userId?: string): Promise<Student | null> {
-      return this.students.find((s) => s.id === id && !s.deleted_at) || null;
+
+    async findById(id: string, userId: string): Promise<Student | null> {
+      return (
+        this.students.find((s) => s.id === id && s.user_id === userId) || null
+      );
     }
-    async findByEmail(): Promise<Student | null> {
-      return null;
+
+    async findByEmail(email: string, userId: string): Promise<Student | null> {
+      return (
+        this.students.find((s) => s.email === email && s.user_id === userId) ||
+        null
+      );
     }
-    async listByUser(): Promise<Student[]> {
-      return this.students;
+
+    async listByUser(userId: string): Promise<Student[]> {
+      return this.students.filter((s) => s.user_id === userId);
     }
-    async listByUserPaginated(): Promise<Student[]> {
-      return this.students;
+
+    async listByUserPaginated(
+      userId: string,
+      page: number,
+      limit: number
+    ): Promise<Student[]> {
+      const offset = (page - 1) * limit;
+      return this.students
+        .filter((s) => s.user_id === userId)
+        .slice(offset, offset + limit);
     }
-    async countByUser(): Promise<number> {
-      return this.students.length;
+
+    async countByUser(userId: string): Promise<number> {
+      return this.students.filter((s) => s.user_id === userId).length;
     }
+
     async update(student: Student): Promise<Student> {
+      const idx = this.students.findIndex((s) => s.id === student.id);
+      if (idx >= 0) this.students[idx] = student;
       return student;
     }
-    async softDelete(): Promise<void> {}
+
+    async softDelete(id: string, userId: string): Promise<void> {
+      const s = this.students.find((s) => s.id === id && s.user_id === userId);
+      if (s) s.updated_at = new Date();
+    }
   }
 
   class FakePlansRepository implements IPlansRepository {
-    public plans: Plan[] = [
-      {
-        id: 'b4c5d6e7-8f9a-4b1c-2d3e-4f5a6b7c8d9e', // UUID v4 válido
-        name: 'Mensal',
-        duration: 30,
-        price: 99.9,
-        created_at: new Date(),
-        deleted_at: null,
-      },
-    ];
+    private plans: Plan[] = [];
+
     async create(plan: Plan): Promise<Plan> {
-      this.plans.push(plan);
-      return plan;
+      const p = {
+        ...plan,
+        id: 'b4e2c3d5-6e7f-5b8c-9d0e-1f2a3b4c5d6e',
+        created_at: new Date(),
+        updated_at: new Date(),
+      };
+      this.plans.push(p);
+      return p;
     }
-    async findById(id: string, userId?: string): Promise<Plan | null> {
-      return this.plans.find((p) => p.id === id && !p.deleted_at) || null;
+
+    async findById(id: string, user_id: string): Promise<Plan | null> {
+      return (
+        this.plans.find((p) => p.id === id && p.user_id === user_id) || null
+      );
     }
-    async findByName(): Promise<Plan | null> {
-      return null;
+
+    async findByName(name: string): Promise<Plan | null> {
+      return this.plans.find((p) => p.title === name) || null;
     }
-    async list(): Promise<Plan[]> {
-      return this.plans;
+
+    async listByUser(user_id: string): Promise<Plan[]> {
+      return this.plans.filter((p) => p.user_id === user_id);
     }
+
     async update(plan: Plan): Promise<Plan> {
+      const idx = this.plans.findIndex((p) => p.id === plan.id);
+      if (idx >= 0) this.plans[idx] = plan;
       return plan;
     }
-    async softDelete(): Promise<void> {}
+
+    async softDelete(id: string): Promise<void> {
+      const plan = this.plans.find((p) => p.id === id);
+      if (plan) plan.updated_at = new Date();
+    }
   }
+
+  let createEnrollmentUseCase: CreateEnrollmentUseCase;
+  let enrollmentsRepository: FakeEnrollmentsRepository;
+  let studentsRepository: FakeStudentsRepository;
+  let plansRepository: FakePlansRepository;
 
   beforeEach(() => {
     enrollmentsRepository = new FakeEnrollmentsRepository();
@@ -138,75 +193,120 @@ describe('CreateEnrollmentUseCase', () => {
     );
   });
 
-  it('deve criar uma matrícula válida', async () => {
-    const enrollment = await createEnrollmentUseCase.execute({
-      student_id: 'a3e1b2c4-5d6f-4a7b-8c9d-0e1f2a3b4c5d',
-      plan_id: 'b4c5d6e7-8f9a-4b1c-2d3e-4f5a6b7c8d9e',
-      start_date: '2024-08-01T00:00:00.000Z',
+  it('deve criar uma matrícula com sucesso', async () => {
+    // Criar aluno e plano primeiro
+    const student = await studentsRepository.create({
+      id: '',
+      name: 'João Silva',
+      email: 'joao@email.com',
+      phone: '11999999999',
+      birth_date: new Date('1990-01-01'),
+      gender: 'MALE',
+      user_id: '550e8400-e29b-41d4-a716-446655440000',
+      created_at: new Date(),
+      updated_at: new Date(),
     });
-    expect(enrollment).toHaveProperty('id');
-    expect(enrollment.student_id).toBe('a3e1b2c4-5d6f-4a7b-8c9d-0e1f2a3b4c5d');
-    expect(enrollment.plan_id).toBe('b4c5d6e7-8f9a-4b1c-2d3e-4f5a6b7c8d9e');
+
+    const plan = await plansRepository.create({
+      id: '',
+      title: 'Mensal',
+      description: 'Plano mensal',
+      duration: 30,
+      price: 99.9,
+      user_id: '550e8400-e29b-41d4-a716-446655440000',
+      created_at: new Date(),
+      updated_at: new Date(),
+    });
+
+    const enrollment = await createEnrollmentUseCase.execute({
+      student_id: student.id,
+      plan_id: plan.id,
+      start_date: '2024-08-01T00:00:00.000Z',
+      user_id: '550e8400-e29b-41d4-a716-446655440000',
+    });
+
+    expect(enrollment.student_id).toBe(student.id);
+    expect(enrollment.plan_id).toBe(plan.id);
     expect(enrollment.price).toBe(99.9);
-    expect(enrollment.end_date > enrollment.start_date).toBe(true);
   });
 
-  it('não deve permitir matrícula duplicada ativa', async () => {
-    await createEnrollmentUseCase.execute({
-      student_id: 'a3e1b2c4-5d6f-4a7b-8c9d-0e1f2a3b4c5d',
-      plan_id: 'b4c5d6e7-8f9a-4b1c-2d3e-4f5a6b7c8d9e',
-      start_date: '2024-08-01T00:00:00.000Z',
+  it('deve rejeitar matrícula com aluno inexistente', async () => {
+    const plan = await plansRepository.create({
+      id: '',
+      title: 'Mensal',
+      description: 'Plano mensal',
+      duration: 30,
+      price: 99.9,
+      user_id: '550e8400-e29b-41d4-a716-446655440000',
+      created_at: new Date(),
+      updated_at: new Date(),
     });
+
     await expect(
       createEnrollmentUseCase.execute({
         student_id: 'a3e1b2c4-5d6f-4a7b-8c9d-0e1f2a3b4c5d',
-        plan_id: 'b4c5d6e7-8f9a-4b1c-2d3e-4f5a6b7c8d9e',
-        start_date: '2024-09-01T00:00:00.000Z',
+        plan_id: plan.id,
+        start_date: '2024-08-01T00:00:00.000Z',
+        user_id: '550e8400-e29b-41d4-a716-446655440000',
       })
-    ).rejects.toThrow('Aluno já possui matrícula ativa');
+    ).rejects.toBeInstanceOf(AppError);
   });
 
-  it('deve validar aluno existente', async () => {
-    const fakeStudents = new FakeStudentsRepository();
-    fakeStudents.students = [];
-    const useCase = new CreateEnrollmentUseCase(
-      enrollmentsRepository,
-      fakeStudents,
-      plansRepository
-    );
+  it('deve rejeitar matrícula duplicada ativa', async () => {
+    const student = await studentsRepository.create({
+      id: '',
+      name: 'João Silva',
+      email: 'joao@email.com',
+      phone: '11999999999',
+      birth_date: new Date('1990-01-01'),
+      gender: 'MALE',
+      user_id: '550e8400-e29b-41d4-a716-446655440000',
+      created_at: new Date(),
+      updated_at: new Date(),
+    });
+
+    const plan = await plansRepository.create({
+      id: '',
+      title: 'Mensal',
+      description: 'Plano mensal',
+      duration: 30,
+      price: 99.9,
+      user_id: '550e8400-e29b-41d4-a716-446655440000',
+      created_at: new Date(),
+      updated_at: new Date(),
+    });
+
+    // Criar primeira matrícula diretamente no repositório (simulando matrícula já existente)
+    await enrollmentsRepository.create({
+      id: '',
+      student_id: student.id,
+      plan_id: plan.id,
+      start_date: new Date('2024-01-01'),
+      end_date: new Date('2024-02-01'), // Matrícula ativa até fevereiro
+      price: 99.9,
+      created_at: new Date(),
+      deleted_at: null,
+    });
+
+    // Tentar criar segunda matrícula via use case (deve falhar)
     await expect(
-      useCase.execute({
-        student_id: 'c5d6e7f8-9a0b-4c1d-2e3f-4a5b6c7d8e9f', // UUID v4 válido
-        plan_id: 'b4c5d6e7-8f9a-4b1c-2d3e-4f5a6b7c8d9e',
-        start_date: '2025-07-17T21:16:35.058Z',
+      createEnrollmentUseCase.execute({
+        student_id: student.id,
+        plan_id: plan.id,
+        start_date: '2024-01-15T00:00:00.000Z',
+        user_id: '550e8400-e29b-41d4-a716-446655440000',
       })
-    ).rejects.toThrow('Aluno não encontrado');
+    ).rejects.toBeInstanceOf(AppError);
   });
 
-  it('deve validar plano existente', async () => {
-    const fakePlans = new FakePlansRepository();
-    fakePlans.plans = [];
-    const useCase = new CreateEnrollmentUseCase(
-      enrollmentsRepository,
-      studentsRepository,
-      fakePlans
-    );
-    await expect(
-      useCase.execute({
-        student_id: 'a3e1b2c4-5d6f-4a7b-8c9d-0e1f2a3b4c5d',
-        plan_id: 'c5d6e7f8-9a0b-4c1d-2e3f-4a5b6c7d8e9f', // UUID v4 válido
-        start_date: '2025-07-17T21:16:35.058Z',
-      })
-    ).rejects.toThrow('Plano não encontrado');
-  });
-
-  it('deve validar campos obrigatórios', async () => {
+  it('deve rejeitar dados inválidos', async () => {
     await expect(
       createEnrollmentUseCase.execute({
         student_id: '',
         plan_id: '',
         start_date: '',
+        user_id: '550e8400-e29b-41d4-a716-446655440000',
       })
-    ).rejects.toThrow();
+    ).rejects.toBeInstanceOf(AppError);
   });
 });

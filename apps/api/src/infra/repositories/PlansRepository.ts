@@ -17,55 +17,69 @@ export class PlansRepository implements IPlansRepository {
     const now = new Date();
     await this.db('plans').insert({
       id,
-      name: plan.name,
-      duration: plan.duration,
+      title: plan.title,
+      description: plan.description,
       price: plan.price,
+      duration: plan.duration,
+      user_id: plan.user_id,
       created_at: now,
-      deleted_at: null,
+      updated_at: now,
     });
-    return this.findById(id) as Promise<Plan>;
+    return this.findById(id, plan.user_id) as Promise<Plan>;
   }
 
-  async findById(id: string): Promise<Plan | null> {
-    const plan = await this.db('plans').where({ id, deleted_at: null }).first();
+  async findById(id: string, userId: string): Promise<Plan | null> {
+    const plan = await this.db('plans')
+      .where({ id, user_id: userId })
+      .whereNull('deleted_at')
+      .first();
     return plan ? this.map(plan) : null;
   }
 
   async findByName(name: string): Promise<Plan | null> {
     const plan = await this.db('plans')
-      .where({ name, deleted_at: null })
+      .where({ title: name })
+      .whereNull('deleted_at')
       .first();
     return plan ? this.map(plan) : null;
   }
 
-  async list(): Promise<Plan[]> {
-    const plans = await this.db('plans').where({ deleted_at: null });
+  async listByUser(userId: string): Promise<Plan[]> {
+    const plans = await this.db('plans')
+      .where({ user_id: userId })
+      .whereNull('deleted_at')
+      .orderBy('created_at', 'desc');
     return plans.map(this.map);
   }
 
   async update(plan: Plan): Promise<Plan> {
-    await this.db('plans').where({ id: plan.id, deleted_at: null }).update({
-      name: plan.name,
-      duration: plan.duration,
-      price: plan.price,
-    });
-    return this.findById(plan.id) as Promise<Plan>;
+    await this.db('plans')
+      .where({ id: plan.id, user_id: plan.user_id })
+      .whereNull('deleted_at')
+      .update({
+        title: plan.title,
+        description: plan.description,
+        price: plan.price,
+        duration: plan.duration,
+        updated_at: new Date(),
+      });
+    return this.findById(plan.id, plan.user_id) as Promise<Plan>;
   }
 
   async softDelete(id: string): Promise<void> {
-    await this.db('plans')
-      .where({ id, deleted_at: null })
-      .update({ deleted_at: new Date() });
+    await this.db('plans').where({ id }).update({ deleted_at: new Date() });
   }
 
   private map(plan: any): Plan {
     return {
       id: plan.id,
-      name: plan.name,
-      duration: plan.duration,
+      title: plan.title,
+      description: plan.description,
       price: Number(plan.price),
+      duration: plan.duration,
+      user_id: plan.user_id,
       created_at: new Date(plan.created_at),
-      deleted_at: plan.deleted_at ? new Date(plan.deleted_at) : null,
+      updated_at: new Date(plan.updated_at),
     };
   }
 }
