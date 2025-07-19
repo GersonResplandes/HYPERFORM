@@ -33,10 +33,9 @@ export class StudentsRepository implements IStudentsRepository {
   }
 
   async listByUser(userId: string): Promise<Student[]> {
-    const data = await this.knex('students')
+    return this.knex('students')
       .where({ user_id: userId })
-      .whereNull('deleted_at');
-    return data as Student[];
+      .andWhere('deleted_at', null);
   }
 
   async listByUserPaginated(
@@ -44,12 +43,12 @@ export class StudentsRepository implements IStudentsRepository {
     page: number,
     limit: number
   ): Promise<Student[]> {
-    const data = await this.knex('students')
+    const offset = (page - 1) * limit;
+    return this.knex('students')
       .where({ user_id: userId })
-      .whereNull('deleted_at')
+      .andWhere('deleted_at', null)
       .limit(limit)
-      .offset((page - 1) * limit);
-    return data as Student[];
+      .offset(offset);
   }
 
   async countByUser(userId: string): Promise<number> {

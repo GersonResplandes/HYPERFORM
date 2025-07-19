@@ -1,75 +1,70 @@
-import { z } from 'zod';
+import { injectable, inject } from 'tsyringe';
 import { IStudentsRepository } from '../repositories/IStudentsRepository';
-import { Student, Gender } from '../entities/Student';
+import { z } from 'zod';
+import { AppError } from '../errors/AppError';
 
 const updateStudentSchema = z.object({
   id: z.string().uuid(),
-  name: z.string().min(3, 'Nome deve ter pelo menos 3 caracteres'),
-  email: z.string().email('E-mail inválido'),
-  phone: z.string().regex(/^\(?\d{2}\)? ?9?\d{4}-?\d{4}$/),
-  birth_date: z.union([z.string(), z.date()]).transform((val) => new Date(val)),
-  gender: z.enum(['MALE', 'FEMALE', 'OTHER']),
-  notes: z.string().optional(),
   user_id: z.string().uuid(),
+  name: z.string().min(3, 'Nome deve ter pelo menos 3 caracteres').optional(),
+  email: z.string().email('E-mail inválido').optional(),
+  phone: z
+    .string()
+    .min(10, 'Telefone deve ter pelo menos 10 dígitos')
+    .optional(),
+  birthDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Data deve estar no formato YYYY-MM-DD')
+    .optional(),
 });
 
-interface IRequest {
+interface UpdateStudentDTO {
   id: string;
-  name: string;
-  email: string;
-  phone: string;
-  birth_date: Date | string;
-  gender: Gender;
-  notes?: string;
   user_id: string;
+  name?: string;
+  email?: string;
+  phone?: string;
+  birthDate?: string;
 }
 
+@injectable()
 export class UpdateStudentUseCase {
-  constructor(private studentsRepository: IStudentsRepository) {}
+  constructor(
+    @inject('StudentsRepository')
+    private studentsRepository: IStudentsRepository
+  ) {}
 
-  async execute(data: IRequest): Promise<Student> {
-    console.log('UpdateStudentUseCase.execute data:', data);
-    console.log(
-      'typeof id:',
-      typeof data.id,
-      'typeof user_id:',
-      typeof data.user_id,
-      'id:',
-      data.id,
-      'user_id:',
-      data.user_id
-    );
+  async execute(data: UpdateStudentDTO) {
     const parsed = updateStudentSchema.safeParse(data);
     if (!parsed.success) {
-      console.log('zod issues:', parsed.error.issues);
-      throw new Error(
-        parsed.error.issues.map((e: any) => e.message).join(', ')
+      throw new AppError(
+        parsed.error.issues.map((i) => i.message).join(', '),
+        422
       );
     }
-    const { id, name, email, phone, birth_date, gender, notes, user_id } =
-      parsed.data;
+    const { id, user_id, name, email, phone, birthDate } = parsed.data;
+    // Busca aluno e valida escopo
     const student = await this.studentsRepository.findById(id, user_id);
     if (!student) {
-      throw new Error('Aluno não encontrado');
+      throw new AppError('Acesso negado ou aluno não encontrado', 403);
     }
-    // Checar se o e-mail está mudando e se já existe para outro aluno
-    if (email !== student.email) {
-      const existing = await this.studentsRepository.findByEmail(
-        email,
-        user_id
-      );
-      if (existing && existing.id !== id) {
-        throw new Error('E-mail de aluno já cadastrado para este usuário');
-      }
+    // Ao menos um campo deve ser informado
+    if (!name && !email && !phone && !birthDate) {
+      throw new AppError('Informe ao menos um campo para atualizar', 400);
     }
-    student.name = name;
-    student.email = email;
-    student.phone = phone;
-    student.birth_date = new Date(birth_date);
-    student.gender = gender;
-    student.notes = notes;
-    student.updated_at = new Date();
-    await this.studentsRepository.update(student);
-    return student;
+    // Monta objeto de atualização sem sobrescrever undefined
+    const updateData: any = Object.fromEntries(
+      Object.entries({ name, email, phone, birth_date: birthDate }).filter(
+        ([, v]) => v !== undefined
+      )
+    );
+    if (updateData.birth_date) {
+      updateData.birth_date = new Date(updateData.birth_date);
+    }
+    const updated = await this.studentsRepository.update({
+      ...student,
+      ...updateData,
+    });
+    return updated;
   }
 }

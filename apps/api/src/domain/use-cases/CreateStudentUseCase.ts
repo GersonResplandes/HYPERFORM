@@ -43,7 +43,7 @@ export class CreateStudentUseCase {
     }
 
     const now = new Date();
-    const student = new Student({
+    const student: Student = {
       id: uuidv4(),
       name,
       email,
@@ -55,7 +55,7 @@ export class CreateStudentUseCase {
       updated_at: now,
       deleted_at: null,
       user_id,
-    });
+    };
 
     await this.studentsRepository.create(student);
     return student;

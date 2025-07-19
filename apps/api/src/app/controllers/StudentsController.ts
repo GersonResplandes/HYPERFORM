@@ -49,20 +49,21 @@ export class StudentsController {
     try {
       const user_id = req.user.id;
       const { id } = req.params;
-      const { name, email, phone, birth_date, gender, notes } = req.body;
-      const useCase = new UpdateStudentUseCase(this.studentsRepository);
+      const { name, email, phone, birthDate } = req.body;
+      const useCase = container.resolve(UpdateStudentUseCase);
       const student = await useCase.execute({
         id,
+        user_id,
         name,
         email,
         phone,
-        birth_date,
-        gender,
-        notes,
-        user_id,
+        birthDate,
       });
       return res.json(student);
     } catch (err: any) {
+      if (err.statusCode === 403) {
+        return res.status(403).json({ error: err.message });
+      }
       return res.status(400).json({ error: err.message });
     }
   }
