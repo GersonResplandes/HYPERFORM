@@ -1,5 +1,5 @@
 import { Workout } from '../../domain/use-cases/workouts/Workout';
-import { IWorkoutsRepository } from '../../domain/use-cases/workouts/IWorkoutsRepository';
+import { IWorkoutsRepository } from '../../domain/repositories/IWorkoutsRepository';
 import { DatabaseConnection } from '../database/connection';
 
 export class WorkoutsRepository implements IWorkoutsRepository {

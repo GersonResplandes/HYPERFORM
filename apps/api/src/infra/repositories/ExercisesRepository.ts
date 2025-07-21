@@ -1,5 +1,5 @@
 import { Exercise } from '../../domain/use-cases/exercises/Exercise';
-import { IExercisesRepository } from '../../domain/use-cases/exercises/IExercisesRepository';
+import { IExercisesRepository } from '../../domain/repositories/IExercisesRepository';
 import { DatabaseConnection } from '../database/connection';
 
 export class ExercisesRepository implements IExercisesRepository {

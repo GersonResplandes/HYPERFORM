@@ -1,6 +1,6 @@
 import { injectable } from 'tsyringe';
 import { v4 as uuidv4 } from 'uuid';
-import { IPlansRepository } from '../../domain/use-cases/plans/IPlansRepository';
+import { IPlansRepository } from '../../domain/repositories/IPlansRepository';
 import { Plan } from '../../domain/use-cases/plans/Plan';
 import { DatabaseConnection } from '../database/connection';
 

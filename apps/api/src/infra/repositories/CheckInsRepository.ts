@@ -4,7 +4,7 @@ import {
   ICheckInsRepository,
   ListCheckInsParams,
   ListCheckInsResult,
-} from '../../domain/use-cases/checkins/ICheckInsRepository';
+} from '../../domain/repositories/ICheckInsRepository';
 import { CheckIn } from '../../domain/use-cases/checkins/CheckIn';
 import { DatabaseConnection } from '../database/connection';
 
