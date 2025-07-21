@@ -1,4 +1,4 @@
-import { Enrollment } from './Enrollment';
+import { Enrollment } from '../use-cases/enrollments/Enrollment';
 
 export interface IEnrollmentsRepository {
   create(enrollment: Enrollment): Promise<Enrollment>;

@@ -33,7 +33,7 @@ export class UpdatePhysicalProgressUseCase {
     const updated: PhysicalProgress = {
       ...record,
       ...parsed.data,
-      updated_at: new Date(),
+      atualizado_em: new Date(),
     };
     await this.repo.update(updated);
     return updated;

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { IExercisesRepository } from './IExercisesRepository';
+import { IExercisesRepository } from '../../repositories/IExercisesRepository';
 import { Exercise, GrupoMuscular } from './Exercise';
 
 const updateExerciseSchema = z.object({

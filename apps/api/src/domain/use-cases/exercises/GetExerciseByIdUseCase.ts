@@ -1,4 +1,4 @@
-import { IExercisesRepository } from './IExercisesRepository';
+import { IExercisesRepository } from '../../repositories/IExercisesRepository';
 import { Exercise } from './Exercise';
 
 export class GetExerciseByIdUseCase {

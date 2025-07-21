@@ -1,4 +1,4 @@
-import { WorkoutStudent } from './WorkoutStudent';
+import { WorkoutStudent } from '../use-cases/workouts/WorkoutStudent';
 
 export interface IWorkoutStudentsRepository {
   linkWorkoutToStudent(data: WorkoutStudent): Promise<WorkoutStudent>;

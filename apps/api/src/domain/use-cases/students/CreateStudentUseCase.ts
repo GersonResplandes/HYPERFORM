@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
-import { IStudentsRepository } from './IStudentsRepository';
+import { IStudentsRepository } from '../../repositories/IStudentsRepository';
 import { Student, Gender } from './Student';
 
 const createStudentSchema = z.object({

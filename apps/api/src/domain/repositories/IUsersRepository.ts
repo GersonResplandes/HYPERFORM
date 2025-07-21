@@ -1,4 +1,4 @@
-import { User, CreateUserData } from './User';
+import { User, CreateUserData } from '../use-cases/users/User';
 
 export interface IUsersRepository {
   create(data: CreateUserData): Promise<User>;

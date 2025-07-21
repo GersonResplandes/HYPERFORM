@@ -1,4 +1,4 @@
-import { IStudentsRepository } from './IStudentsRepository';
+import { IStudentsRepository } from '../../repositories/IStudentsRepository';
 
 interface IListStudentsResult {
   students: Array<{

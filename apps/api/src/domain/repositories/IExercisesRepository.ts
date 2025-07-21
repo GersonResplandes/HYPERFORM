@@ -1,4 +1,4 @@
-import { Exercise } from './Exercise';
+import { Exercise } from '../use-cases/exercises/Exercise';
 
 export interface IExercisesRepository {
   create(exercise: Exercise): Promise<Exercise>;

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
-import { IWorkoutExercisesRepository } from './IWorkoutExercisesRepository';
+import { IWorkoutExercisesRepository } from '../../repositories/IWorkoutExercisesRepository';
 import { WorkoutExercise } from './WorkoutExercise';
 
 const addExerciseToWorkoutSchema = z.object({

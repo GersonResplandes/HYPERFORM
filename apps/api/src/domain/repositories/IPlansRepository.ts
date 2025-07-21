@@ -1,4 +1,4 @@
-import { Plan } from './Plan';
+import { Plan } from '../use-cases/plans/Plan';
 
 export interface IPlansRepository {
   create(plan: Plan): Promise<Plan>;

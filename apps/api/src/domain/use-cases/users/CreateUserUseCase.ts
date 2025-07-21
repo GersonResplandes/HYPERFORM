@@ -1,6 +1,6 @@
 import { injectable, inject } from 'tsyringe';
 import { CreateUserData, User, UserWithoutPassword } from './User';
-import { IUsersRepository } from './IUsersRepository';
+import { IUsersRepository } from '../../repositories/IUsersRepository';
 import { IHashProvider } from '../../providers/IHashProvider';
 import { AppError } from '../../errors/AppError';
 

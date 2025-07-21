@@ -1,4 +1,4 @@
-import { IExercisesRepository } from './IExercisesRepository';
+import { IExercisesRepository } from '../../repositories/IExercisesRepository';
 
 export class DeleteExerciseUseCase {
   constructor(private exercisesRepository: IExercisesRepository) {}

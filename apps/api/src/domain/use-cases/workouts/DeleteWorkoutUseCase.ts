@@ -1,4 +1,4 @@
-import { IWorkoutsRepository } from './IWorkoutsRepository';
+import { IWorkoutsRepository } from '../../repositories/IWorkoutsRepository';
 
 export class DeleteWorkoutUseCase {
   constructor(private workoutsRepository: IWorkoutsRepository) {}

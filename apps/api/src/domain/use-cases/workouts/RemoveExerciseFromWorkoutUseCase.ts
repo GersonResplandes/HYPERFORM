@@ -1,4 +1,4 @@
-import { IWorkoutExercisesRepository } from './IWorkoutExercisesRepository';
+import { IWorkoutExercisesRepository } from '../../repositories/IWorkoutExercisesRepository';
 
 export class RemoveExerciseFromWorkoutUseCase {
   constructor(

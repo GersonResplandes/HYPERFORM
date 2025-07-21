@@ -1,4 +1,4 @@
-import { Student } from './Student';
+import { Student } from '../use-cases/students/Student';
 
 export interface ListStudentsFilters {
   userId: string;

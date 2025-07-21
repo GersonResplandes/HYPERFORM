@@ -1,6 +1,6 @@
 import { injectable, inject } from 'tsyringe';
-import { IEnrollmentsRepository } from '../enrollments/IEnrollmentsRepository';
-import { IStudentsRepository } from '../students/IStudentsRepository';
+import { IEnrollmentsRepository } from '../../repositories/IEnrollmentsRepository';
+import { IStudentsRepository } from '../../repositories/IStudentsRepository';
 import { z } from 'zod';
 import { AppError } from '../../errors/AppError';
 

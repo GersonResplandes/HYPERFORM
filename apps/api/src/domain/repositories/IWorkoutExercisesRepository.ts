@@ -1,4 +1,4 @@
-import { WorkoutExercise } from './WorkoutExercise';
+import { WorkoutExercise } from '../use-cases/workouts/WorkoutExercise';
 
 export interface IWorkoutExercisesRepository {
   addExerciseToWorkout(data: WorkoutExercise): Promise<WorkoutExercise>;

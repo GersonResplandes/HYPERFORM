@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { IWorkoutsRepository } from './IWorkoutsRepository';
+import { IWorkoutsRepository } from '../../repositories/IWorkoutsRepository';
 import { Workout, ObjetivoTreino } from './Workout';
 
 const updateWorkoutSchema = z.object({

@@ -1,5 +1,5 @@
 import { injectable, inject } from 'tsyringe';
-import { IStudentsRepository } from './IStudentsRepository';
+import { IStudentsRepository } from '../../repositories/IStudentsRepository';
 import { AppError } from '../../errors/AppError';
 
 @injectable()

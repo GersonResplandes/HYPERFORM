@@ -1,7 +1,7 @@
 import { injectable, inject } from 'tsyringe';
-import { ICheckInsRepository } from './ICheckInsRepository';
-import { IStudentsRepository } from '../students/IStudentsRepository';
-import { IEnrollmentsRepository } from '../enrollments/IEnrollmentsRepository';
+import { ICheckInsRepository } from '../../repositories/ICheckInsRepository';
+import { IStudentsRepository } from '../../repositories/IStudentsRepository';
+import { IEnrollmentsRepository } from '../../repositories/IEnrollmentsRepository';
 import { z } from 'zod';
 import { AppError } from '../../errors/AppError';
 

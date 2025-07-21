@@ -4,9 +4,30 @@ import { CreatePhysicalProgressUseCase } from '../../domain/use-cases/physical-p
 import { UpdatePhysicalProgressUseCase } from '../../domain/use-cases/physical-progress/UpdatePhysicalProgressUseCase';
 import { DeletePhysicalProgressUseCase } from '../../domain/use-cases/physical-progress/DeletePhysicalProgressUseCase';
 import { ListStudentPhysicalProgressUseCase } from '../../domain/use-cases/physical-progress/ListStudentPhysicalProgressUseCase';
+import { ListStudentPhysicalProgressChartUseCase } from '../../domain/use-cases/physical-progress/ListStudentPhysicalProgressChartUseCase';
 
 export class PhysicalProgressController {
   private repo = new PhysicalProgressRepository();
+
+  async list(req: Request, res: Response) {
+    try {
+      const useCase = new ListStudentPhysicalProgressUseCase(this.repo);
+      const result = await useCase.execute(req.params.id);
+      return res.json(result);
+    } catch (err: any) {
+      return res.status(400).json({ error: err.message });
+    }
+  }
+
+  async chart(req: Request, res: Response) {
+    try {
+      const useCase = new ListStudentPhysicalProgressChartUseCase(this.repo);
+      const result = await useCase.execute(req.params.id);
+      return res.json(result);
+    } catch (err: any) {
+      return res.status(400).json({ error: err.message });
+    }
+  }
 
   async create(req: Request, res: Response) {
     try {
@@ -38,16 +59,6 @@ export class PhysicalProgressController {
       return res.status(204).send();
     } catch (err: any) {
       return res.status(404).json({ error: err.message });
-    }
-  }
-
-  async listByStudent(req: Request, res: Response) {
-    try {
-      const useCase = new ListStudentPhysicalProgressUseCase(this.repo);
-      const result = await useCase.execute(req.params.aluno_id);
-      return res.json(result);
-    } catch (err: any) {
-      return res.status(400).json({ error: err.message });
     }
   }
 }

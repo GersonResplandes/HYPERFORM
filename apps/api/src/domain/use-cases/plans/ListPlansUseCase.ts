@@ -1,5 +1,5 @@
 import { inject, injectable } from 'tsyringe';
-import { IPlansRepository } from './IPlansRepository';
+import { IPlansRepository } from '../../repositories/IPlansRepository';
 import { Plan } from './Plan';
 
 @injectable()

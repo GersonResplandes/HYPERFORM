@@ -1,5 +1,5 @@
 import { injectable, inject } from 'tsyringe';
-import { IEnrollmentsRepository } from './IEnrollmentsRepository';
+import { IEnrollmentsRepository } from '../../repositories/IEnrollmentsRepository';
 import { Enrollment } from './Enrollment';
 import { AppError } from '../../errors/AppError';
 

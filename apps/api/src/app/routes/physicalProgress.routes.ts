@@ -8,14 +8,20 @@ const router = Router();
 
 router.use(ensureAuthenticated);
 
-router.get('/:aluno_id', (req, res) => controller.listByStudent(req, res));
-router.post('/', ensureRole('INSTRUTOR'), (req, res) =>
+// Visualização do progresso e gráfico (aluno só pode ver o próprio)
+router.get('/alunos/:id/progresso', (req, res) => controller.list(req, res));
+router.get('/alunos/:id/progresso/grafico', (req, res) =>
+  controller.chart(req, res)
+);
+
+// CRUD de avaliações (restrito a instrutor/admin)
+router.post('/avaliacoes', ensureRole('INSTRUTOR', 'ADMIN'), (req, res) =>
   controller.create(req, res)
 );
-router.put('/:id', ensureRole('INSTRUTOR'), (req, res) =>
+router.put('/avaliacoes/:id', ensureRole('INSTRUTOR', 'ADMIN'), (req, res) =>
   controller.update(req, res)
 );
-router.delete('/:id', ensureRole('INSTRUTOR'), (req, res) =>
+router.delete('/avaliacoes/:id', ensureRole('INSTRUTOR', 'ADMIN'), (req, res) =>
   controller.delete(req, res)
 );
 

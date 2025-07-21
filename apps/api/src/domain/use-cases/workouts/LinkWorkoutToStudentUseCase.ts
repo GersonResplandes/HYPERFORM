@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
-import { IWorkoutStudentsRepository } from './IWorkoutStudentsRepository';
+import { IWorkoutStudentsRepository } from '../../repositories/IWorkoutStudentsRepository';
 import { WorkoutStudent } from './WorkoutStudent';
 
 const linkWorkoutToStudentSchema = z.object({

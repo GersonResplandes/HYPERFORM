@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
-import { IUsersRepository } from '../../domain/use-cases/users/IUsersRepository';
+import { IUsersRepository } from '../../domain/repositories/IUsersRepository';
 import { UsersRepository } from '../../infra/repositories/UsersRepository';
 
 import { IHashProvider } from '../../domain/providers/IHashProvider';
@@ -10,19 +10,19 @@ import { HashProvider } from '../../infra/providers/HashProvider';
 import { ITokenProvider } from '../../domain/providers/ITokenProvider';
 import { TokenProvider } from '../../infra/providers/TokenProvider';
 
-import { IPlansRepository } from '../../domain/use-cases/plans/IPlansRepository';
+import { IPlansRepository } from '../../domain/repositories/IPlansRepository';
 import { PlansRepository } from '../../infra/repositories/PlansRepository';
 
-import { IEnrollmentsRepository } from '../../domain/use-cases/enrollments/IEnrollmentsRepository';
+import { IEnrollmentsRepository } from '../../domain/repositories/IEnrollmentsRepository';
 import { EnrollmentsRepository } from '../../infra/repositories/EnrollmentsRepository';
 
-import { IStudentsRepository } from '../../domain/use-cases/students/IStudentsRepository';
+import { IStudentsRepository } from '../../domain/repositories/IStudentsRepository';
 import { StudentsRepository } from '../../infra/repositories/StudentsRepository';
 
 import { CacheProvider } from '../../infra/providers/CacheProvider';
 import { CheckActiveEnrollmentUseCase } from '../../domain/use-cases/enrollments/CheckActiveEnrollmentUseCase';
 import { CheckInsRepository } from '../../infra/repositories/CheckInsRepository';
-import { ICheckInsRepository } from '../../domain/use-cases/checkins/ICheckInsRepository';
+import { ICheckInsRepository } from '../../domain/repositories/ICheckInsRepository';
 import { CheckInUseCase } from '../../domain/use-cases/checkins/CheckInUseCase';
 import { ListStudentCheckInsUseCase } from '../../domain/use-cases/checkins/ListStudentCheckInsUseCase';
 import { UpdateStudentUseCase } from '../../domain/use-cases/students/UpdateStudentUseCase';

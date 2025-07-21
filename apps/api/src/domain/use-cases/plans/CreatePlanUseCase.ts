@@ -1,5 +1,5 @@
 import { injectable, inject } from 'tsyringe';
-import { IPlansRepository } from './IPlansRepository';
+import { IPlansRepository } from '../../repositories/IPlansRepository';
 import { Plan } from './Plan';
 import { z } from 'zod';
 import { AppError } from '../../errors/AppError';

@@ -1,5 +1,5 @@
 import { injectable, inject } from 'tsyringe';
-import { IUsersRepository } from './IUsersRepository';
+import { IUsersRepository } from '../../repositories/IUsersRepository';
 import { UserWithoutPassword } from './User';
 import { AppError } from '../../errors/AppError';
 import { CacheProvider } from '../../../infra/providers/CacheProvider';

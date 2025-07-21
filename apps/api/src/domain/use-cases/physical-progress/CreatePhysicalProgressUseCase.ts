@@ -35,8 +35,9 @@ export class CreatePhysicalProgressUseCase {
     const progress: PhysicalProgress = {
       id: uuidv4(),
       ...parsed.data,
-      created_at: now,
-      updated_at: now,
+      data_avaliacao: now,
+      criado_em: now,
+      atualizado_em: now,
     };
     await this.repo.create(progress);
     return progress;

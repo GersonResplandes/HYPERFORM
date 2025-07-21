@@ -1,4 +1,4 @@
-import { CheckIn } from './CheckIn';
+import { CheckIn } from '../use-cases/checkins/CheckIn';
 
 export interface ListCheckInsParams {
   student_id: string;

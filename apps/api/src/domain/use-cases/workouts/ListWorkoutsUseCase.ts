@@ -1,4 +1,4 @@
-import { IWorkoutsRepository } from './IWorkoutsRepository';
+import { IWorkoutsRepository } from '../../repositories/IWorkoutsRepository';
 import { Workout } from './Workout';
 
 export class ListWorkoutsUseCase {
