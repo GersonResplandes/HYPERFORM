@@ -125,4 +125,77 @@ describe('ListStudentsUseCase', () => {
     expect(result.students).toHaveLength(1);
     expect(result.students[0].name).toBe('Aluno 1');
   });
+
+  it('deve paginar corretamente os alunos', async () => {
+    for (let i = 1; i <= 25; i++) {
+      await studentsRepository.create({
+        id: `${i}`.padStart(24, '0'),
+        name: `Aluno ${i}`,
+        email: `a${i}@email.com`,
+        phone: '11999999999',
+        birth_date: new Date(),
+        gender: 'MALE',
+        created_at: new Date(),
+        updated_at: new Date(),
+        user_id,
+        deleted_at: null,
+      });
+    }
+    const result = await listStudentsUseCase.execute(user_id, 2, 10);
+    expect(result.students).toHaveLength(10);
+    expect(result.currentPage).toBe(2);
+    expect(result.totalCount).toBe(25);
+    expect(result.totalPages).toBe(3);
+  });
+
+  it('deve filtrar alunos por nome (case-insensitive, contains)', async () => {
+    await studentsRepository.create({
+      id: '1',
+      name: 'Maria Souza',
+      email: 'maria@email.com',
+      phone: '11999999999',
+      birth_date: new Date(),
+      gender: 'FEMALE',
+      created_at: new Date(),
+      updated_at: new Date(),
+      user_id,
+      deleted_at: null,
+    });
+    await studentsRepository.create({
+      id: '2',
+      name: 'João Silva',
+      email: 'joao@email.com',
+      phone: '11999999999',
+      birth_date: new Date(),
+      gender: 'MALE',
+      created_at: new Date(),
+      updated_at: new Date(),
+      user_id,
+      deleted_at: null,
+    });
+    const result = await listStudentsUseCase.execute(user_id, 1, 10, 'maria');
+    expect(result.students).toHaveLength(1);
+    expect(result.students[0].name).toBe('Maria Souza');
+  });
+
+  it('deve limitar o número máximo de alunos por página a 50', async () => {
+    for (let i = 1; i <= 60; i++) {
+      await studentsRepository.create({
+        id: `${i}`.padStart(24, '0'),
+        name: `Aluno ${i}`,
+        email: `a${i}@email.com`,
+        phone: '11999999999',
+        birth_date: new Date(),
+        gender: 'MALE',
+        created_at: new Date(),
+        updated_at: new Date(),
+        user_id,
+        deleted_at: null,
+      });
+    }
+    const result = await listStudentsUseCase.execute(user_id, 1, 100);
+    expect(result.students).toHaveLength(50);
+    expect(result.totalCount).toBe(60);
+    expect(result.totalPages).toBe(2);
+  });
 });

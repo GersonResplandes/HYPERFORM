@@ -27,9 +27,10 @@ export interface IStudentsRepository {
   listByUserPaginated(
     userId: string,
     page: number,
-    limit: number
+    limit: number,
+    name?: string
   ): Promise<Student[]>;
-  countByUser(userId: string): Promise<number>;
+  countByUser(userId: string, name?: string): Promise<number>;
   update(student: Student): Promise<Student>;
   softDelete(id: string, userId: string): Promise<void>;
 }

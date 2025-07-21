@@ -7,6 +7,7 @@ const controller = new StudentsController();
 
 studentsRoutes.use(ensureAuthenticated);
 studentsRoutes.post('/', (req, res) => controller.create(req, res));
+// GET /students?page=1&limit=10&name=Maria
 studentsRoutes.get('/', (req, res) => controller.list(req, res));
 studentsRoutes.get('/:id/active-enrollment', (req, res) =>
   controller.activeEnrollment(req, res)

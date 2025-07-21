@@ -8,6 +8,7 @@ import { CheckActiveEnrollmentUseCase } from '../../domain/use-cases/CheckActive
 import { CheckInUseCase } from '../../domain/use-cases/CheckInUseCase';
 import { ListStudentCheckInsUseCase } from '../../domain/use-cases/ListStudentCheckInsUseCase';
 import { container } from 'tsyringe';
+import { z } from 'zod';
 
 export class StudentsController {
   private studentsRepository = new StudentsRepository();
@@ -35,10 +36,22 @@ export class StudentsController {
   async list(req: Request, res: Response) {
     try {
       const user_id = req.user.id;
-      const page = Number(req.query.page) || 1;
-      const limit = Math.min(Number(req.query.limit) || 10, 100);
+      const querySchema = z.object({
+        page: z.coerce.number().int().min(1).default(1),
+        limit: z.coerce.number().int().min(1).max(50).default(10),
+        name: z.string().min(1).max(100).optional(),
+      });
+      const parsed = querySchema.safeParse(req.query);
+      if (!parsed.success) {
+        return res
+          .status(400)
+          .json({
+            error: parsed.error.issues.map((i) => i.message).join(', '),
+          });
+      }
+      const { page, limit, name } = parsed.data;
       const useCase = new ListStudentsUseCase(this.studentsRepository);
-      const result = await useCase.execute(user_id, page, limit);
+      const result = await useCase.execute(user_id, page, limit, name);
       return res.json(result);
     } catch (err: any) {
       return res.status(400).json({ error: err.message });

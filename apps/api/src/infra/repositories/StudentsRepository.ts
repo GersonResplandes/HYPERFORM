@@ -41,21 +41,35 @@ export class StudentsRepository implements IStudentsRepository {
   async listByUserPaginated(
     userId: string,
     page: number,
-    limit: number
+    limit: number,
+    name?: string
   ): Promise<Student[]> {
-    const offset = (page - 1) * limit;
-    return this.knex('students')
+    const realLimit = Math.min(limit, 50);
+    const offset = (page - 1) * realLimit;
+    let query = this.knex('students')
       .where({ user_id: userId })
-      .andWhere('deleted_at', null)
-      .limit(limit)
-      .offset(offset);
+      .andWhere('deleted_at', null);
+    if (name) {
+      query = query.andWhereRaw('LOWER(name) LIKE ?', [
+        `%${name.toLowerCase()}%`,
+      ]);
+    }
+    return query
+      .limit(realLimit)
+      .offset(offset)
+      .select('id', 'name', 'email', 'birth_date', 'created_at');
   }
 
-  async countByUser(userId: string): Promise<number> {
-    const [{ count }] = await this.knex('students')
+  async countByUser(userId: string, name?: string): Promise<number> {
+    let query = this.knex('students')
       .where({ user_id: userId })
-      .whereNull('deleted_at')
-      .count<{ count: string }[]>('id as count');
+      .whereNull('deleted_at');
+    if (name) {
+      query = query.andWhereRaw('LOWER(name) LIKE ?', [
+        `%${name.toLowerCase()}%`,
+      ]);
+    }
+    const [{ count }] = await query.count<{ count: string }[]>('id as count');
     return Number(count);
   }
 
