@@ -9,6 +9,9 @@ import { workoutExercisesRoutes } from './workoutExercises.routes';
 import { workoutStudentsRoutes } from './workoutStudents.routes';
 import { physicalProgressRoutes } from './physicalProgress.routes';
 import { paymentsRoutes } from './payments.routes';
+import { planosPagamentoRoutes } from './planosPagamento.routes';
+import { schedulerRoutes } from './scheduler.routes';
+import { notificacoesPagamentoRoutes } from './notificacoesPagamento.routes';
 
 const routes = Router();
 
@@ -22,5 +25,8 @@ routes.use('/workouts/:workoutId/exercises', workoutExercisesRoutes);
 routes.use('/students/:studentId/workouts', workoutStudentsRoutes);
 routes.use('/progresso-fisico', physicalProgressRoutes);
 routes.use('/pagamentos', paymentsRoutes);
+routes.use('/planos-pagamento', planosPagamentoRoutes);
+routes.use('/pagamentos/processar-dia', schedulerRoutes);
+routes.use('/notificacoes-pagamento', notificacoesPagamentoRoutes);
 
 export { routes };
