@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
 import { StudentsRepository } from '../../infra/repositories/StudentsRepository';
-import { CreateStudentUseCase } from '../../domain/use-cases/CreateStudentUseCase';
-import { ListStudentsUseCase } from '../../domain/use-cases/ListStudentsUseCase';
-import { UpdateStudentUseCase } from '../../domain/use-cases/UpdateStudentUseCase';
-import { DeleteStudentUseCase } from '../../domain/use-cases/DeleteStudentUseCase';
-import { CheckActiveEnrollmentUseCase } from '../../domain/use-cases/CheckActiveEnrollmentUseCase';
-import { CheckInUseCase } from '../../domain/use-cases/CheckInUseCase';
-import { ListStudentCheckInsUseCase } from '../../domain/use-cases/ListStudentCheckInsUseCase';
+import { CreateStudentUseCase } from '../../domain/use-cases/students/CreateStudentUseCase';
+import { ListStudentsUseCase } from '../../domain/use-cases/students/ListStudentsUseCase';
+import { UpdateStudentUseCase } from '../../domain/use-cases/students/UpdateStudentUseCase';
+import { DeleteStudentUseCase } from '../../domain/use-cases/students/DeleteStudentUseCase';
+import { CheckActiveEnrollmentUseCase } from '../../domain/use-cases/enrollments/CheckActiveEnrollmentUseCase';
+import { CheckInUseCase } from '../../domain/use-cases/checkins/CheckInUseCase';
+import { ListStudentCheckInsUseCase } from '../../domain/use-cases/checkins/ListStudentCheckInsUseCase';
 import { container } from 'tsyringe';
 import { z } from 'zod';
 
@@ -43,11 +43,9 @@ export class StudentsController {
       });
       const parsed = querySchema.safeParse(req.query);
       if (!parsed.success) {
-        return res
-          .status(400)
-          .json({
-            error: parsed.error.issues.map((i) => i.message).join(', '),
-          });
+        return res.status(400).json({
+          error: parsed.error.issues.map((i) => i.message).join(', '),
+        });
       }
       const { page, limit, name } = parsed.data;
       const useCase = new ListStudentsUseCase(this.studentsRepository);

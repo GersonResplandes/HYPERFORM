@@ -4,8 +4,8 @@ import {
   ICheckInsRepository,
   ListCheckInsParams,
   ListCheckInsResult,
-} from '../../domain/repositories/ICheckInsRepository';
-import { CheckIn } from '../../domain/entities/CheckIn';
+} from '../../domain/use-cases/checkins/ICheckInsRepository';
+import { CheckIn } from '../../domain/use-cases/checkins/CheckIn';
 import { DatabaseConnection } from '../database/connection';
 
 @injectable()

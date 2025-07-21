@@ -1,5 +1,5 @@
-import { Student } from '../../domain/entities/Student';
-import { IStudentsRepository } from '../../domain/repositories/IStudentsRepository';
+import { Student } from '../../domain/use-cases/students/Student';
+import { IStudentsRepository } from '../../domain/use-cases/students/IStudentsRepository';
 import { DatabaseConnection } from '../database/connection';
 
 export class StudentsRepository implements IStudentsRepository {

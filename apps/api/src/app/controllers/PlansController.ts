@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { container } from 'tsyringe';
-import { CreatePlanUseCase } from '../../domain/use-cases/CreatePlanUseCase';
-import { ListPlansUseCase } from '../../domain/use-cases/ListPlansUseCase';
-import { UpdatePlanUseCase } from '../../domain/use-cases/UpdatePlanUseCase';
-import { DeletePlanUseCase } from '../../domain/use-cases/DeletePlanUseCase';
-import { GetPlanByIdUseCase } from '../../domain/use-cases/GetPlanByIdUseCase';
+import { CreatePlanUseCase } from '../../domain/use-cases/plans/CreatePlanUseCase';
+import { ListPlansUseCase } from '../../domain/use-cases/plans/ListPlansUseCase';
+import { UpdatePlanUseCase } from '../../domain/use-cases/plans/UpdatePlanUseCase';
+import { DeletePlanUseCase } from '../../domain/use-cases/plans/DeletePlanUseCase';
+import { GetPlanByIdUseCase } from '../../domain/use-cases/plans/GetPlanByIdUseCase';
 
 export class PlansController {
   async create(

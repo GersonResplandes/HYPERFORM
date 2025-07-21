@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { container } from 'tsyringe';
-import { CreateEnrollmentUseCase } from '../../domain/use-cases/CreateEnrollmentUseCase';
-import { ListEnrollmentsUseCase } from '../../domain/use-cases/ListEnrollmentsUseCase';
-import { GetEnrollmentByIdUseCase } from '../../domain/use-cases/GetEnrollmentByIdUseCase';
-import { DeleteEnrollmentUseCase } from '../../domain/use-cases/DeleteEnrollmentUseCase';
+import { CreateEnrollmentUseCase } from '../../domain/use-cases/enrollments/CreateEnrollmentUseCase';
+import { ListEnrollmentsUseCase } from '../../domain/use-cases/enrollments/ListEnrollmentsUseCase';
+import { GetEnrollmentByIdUseCase } from '../../domain/use-cases/enrollments/GetEnrollmentByIdUseCase';
+import { DeleteEnrollmentUseCase } from '../../domain/use-cases/enrollments/DeleteEnrollmentUseCase';
 
 export class EnrollmentsController {
   async create(

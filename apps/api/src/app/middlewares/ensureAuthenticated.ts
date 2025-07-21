@@ -6,15 +6,18 @@ import { AppError } from '../../domain/errors/AppError';
 interface TokenPayload {
   sub: string;
   email: string;
+  role: 'INSTRUTOR' | 'ALUNO';
 }
 
 declare global {
   namespace Express {
+    interface User {
+      id: string;
+      email: string;
+      role: 'INSTRUTOR' | 'ALUNO';
+    }
     interface Request {
-      user: {
-        id: string;
-        email: string;
-      };
+      user: User;
     }
   }
 }
@@ -34,13 +37,20 @@ export async function ensureAuthenticated(
 
   try {
     const tokenProvider = container.resolve<ITokenProvider>('TokenProvider');
-    const { sub: user_id, email } = tokenProvider.verifyToken(
-      token
-    ) as TokenPayload;
+    const {
+      sub: user_id,
+      email,
+      role,
+    } = tokenProvider.verifyToken(token) as TokenPayload;
+
+    if (!role) {
+      throw new AppError('Perfil do usuário não encontrado no token', 401);
+    }
 
     request.user = {
       id: user_id,
       email,
+      role,
     };
 
     return next();

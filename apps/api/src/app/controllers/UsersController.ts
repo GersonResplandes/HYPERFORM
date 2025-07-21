@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
-import { CreateUserUseCase } from '../../domain/use-cases/CreateUserUseCase';
-import { AuthenticateUserUseCase } from '../../domain/use-cases/AuthenticateUserUseCase';
-import { GetUserProfileUseCase } from '../../domain/use-cases/GetUserProfileUseCase';
+import { CreateUserUseCase } from '../../domain/use-cases/users/CreateUserUseCase';
+import { AuthenticateUserUseCase } from '../../domain/use-cases/users/AuthenticateUserUseCase';
+import { GetUserProfileUseCase } from '../../domain/use-cases/users/GetUserProfileUseCase';
 
 export class UsersController {
   async create(request: Request, response: Response): Promise<Response> {

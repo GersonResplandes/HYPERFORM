@@ -1,7 +1,7 @@
 import { injectable } from 'tsyringe';
 import { v4 as uuidv4 } from 'uuid';
-import { IUsersRepository } from '../../domain/repositories/IUsersRepository';
-import { User, CreateUserData } from '../../domain/entities/User';
+import { IUsersRepository } from '../../domain/use-cases/users/IUsersRepository';
+import { User, CreateUserData } from '../../domain/use-cases/users/User';
 import { DatabaseConnection } from '../database/connection';
 
 @injectable()
