@@ -8,6 +8,7 @@ import { workoutsRoutes } from './workouts.routes';
 import { workoutExercisesRoutes } from './workoutExercises.routes';
 import { workoutStudentsRoutes } from './workoutStudents.routes';
 import { physicalProgressRoutes } from './physicalProgress.routes';
+import { paymentsRoutes } from './payments.routes';
 
 const routes = Router();
 
@@ -20,5 +21,6 @@ routes.use('/workouts', workoutsRoutes);
 routes.use('/workouts/:workoutId/exercises', workoutExercisesRoutes);
 routes.use('/students/:studentId/workouts', workoutStudentsRoutes);
 routes.use('/progresso-fisico', physicalProgressRoutes);
+routes.use('/pagamentos', paymentsRoutes);
 
 export { routes };
